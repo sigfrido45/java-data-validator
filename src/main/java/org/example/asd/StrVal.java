@@ -1,20 +1,18 @@
-package org.example;
+package org.example.asd;
 
 import org.example.interfaces.Complex;
 import org.example.interfaces.Interval;
 import org.example.interfaces.Presence;
 
-import java.util.Map;
-
 public class StrVal extends ValtType<String> implements Presence<String>, Interval<String>, Complex<String> {
 
 
-    public StrVal(Object value, String attrName, Class<String> clazz) {
-        super(value, attrName, clazz);
+    public StrVal(String attrName) {
+        super(attrName, String.class);
     }
 
     @Override
-    public ValtType<String> required(boolean required) {
+    public StrVal required(boolean required) {
         validationFunctions.add(
                 () -> {
                     if (_value == null)
@@ -26,36 +24,15 @@ public class StrVal extends ValtType<String> implements Presence<String>, Interv
     }
 
     @Override
-    public ValtType<String> nullable(boolean nullable) {
+    public StrVal nullable(boolean nullable) {
         if (nullable) {
             continueValidating = false;
         }
         return this;
     }
 
-
     @Override
-    public boolean isValid() {
-        return false;
-    }
-
-    @Override
-    public Map<Object, Object> errors() {
-        return null;
-    }
-
-    @Override
-    public String validated() {
-        return null;
-    }
-
-    @Override
-    public void validate() {
-
-    }
-
-    @Override
-    public ValtType<String> min(int min) {
+    public StrVal min(int min) {
         if (continueValidating) {
             validationFunctions.add(
                     () -> {
@@ -69,7 +46,7 @@ public class StrVal extends ValtType<String> implements Presence<String>, Interv
     }
 
     @Override
-    public ValtType<String> max(int max) {
+    public StrVal max(int max) {
         if (continueValidating) {
             validationFunctions.add(
                     () -> {
@@ -83,12 +60,12 @@ public class StrVal extends ValtType<String> implements Presence<String>, Interv
     }
 
     @Override
-    public ValtType<String> add(ValtType<String> another) {
+    public StrVal add(ValtType<String> another) {
         if (continueValidating) {
             validationFunctions.add(
                     () -> {
                         another.validate();
-                        if(another.isValid())
+                        if (another.isValid())
                             return null;
                         return another.errors();
                     }

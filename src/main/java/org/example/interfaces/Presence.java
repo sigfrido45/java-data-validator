@@ -1,6 +1,6 @@
 package org.example.interfaces;
 
-import org.example.ValtType;
+import org.example.asd.ValtType;
 
 public interface Presence<T> {
 
