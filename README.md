@@ -1,23 +1,29 @@
-package io.sigfrido45;
+# Java data validator
 
-import io.sigfrido45.payload.NodeValidator;
-import io.sigfrido45.payload.TypeValidator;
-import io.sigfrido45.tree.Node;
+Validates data from a map type. It let you define a validator schema for each attribute in the map. <br>
+<strong>It's still on development</strong>
 
-import java.util.HashMap;
-import java.util.Map;
+## Validation
 
-public class Main {
-    public static void main(String[] args) {
-        var payload = new HashMap<>() {{
-            put("name", "123");
-            put("another", new HashMap<>() {{
-                put("name", "lmao");
-            }});
-        }};
+### Payload
 
+Let suppose that you have a payload like this
 
-        var node = (Node.<Map>build())
+```java
+var payload = new HashMap<>() {{
+    put("name", "123");
+    put("another", new HashMap<>() {{
+        put("name", "lmao");
+    }});
+}};
+```
+
+### Schema
+
+We define the schema validator for that payload like this
+
+```java
+var node = (Node.<Map>build())
                 .addNode(
                         Node.<String>build()
                                 .setValidation(
@@ -38,11 +44,16 @@ public class Main {
                                                 )
                                 )
                 );
-
-        var nodeValidator = NodeValidator.validateNode(node, payload);
-        System.out.println(nodeValidator.getErrors());
-        System.out.println(nodeValidator.getValidated());
-    }
+```
 
 
-}
+### Results
+Finally we validate that schema 
+
+```java
+var nodeValidator = NodeValidator.validateNode(node, payload);
+System.out.println(nodeValidator.getErrors());
+System.out.println(nodeValidator.getValidated());
+```
+
+
