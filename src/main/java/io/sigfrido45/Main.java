@@ -1,8 +1,8 @@
 package io.sigfrido45;
 
+import io.sigfrido45.payload.NodeValidator;
+import io.sigfrido45.payload.TypeValidator;
 import io.sigfrido45.tree.Node;
-import io.sigfrido45.tree.NodeValidator;
-import io.sigfrido45.tree.Validation;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,18 +21,18 @@ public class Main {
                 .addNode(
                         Node.<String>build()
                                 .setValidation(
-                                        Validation.strValidator("name")
+                                        TypeValidator.str("name")
                                                 .required(true)
                                                 .min(1)
                                 )
                 )
                 .addNode(
                         Node.<Map>build()
-                                .setValidation(Validation.mapValidator("another"))
+                                .setValidation(TypeValidator.map("another"))
                                 .addNode(
                                         Node.<String>build()
                                                 .setValidation(
-                                                        Validation.strValidator("name")
+                                                        TypeValidator.str("name")
                                                                 .required(true)
                                                                 .min(1)
                                                 )
