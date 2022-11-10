@@ -1,21 +1,21 @@
 package io.sigfrido45.tree;
 
-import io.sigfrido45.validation.AbstractTypeValidation;
+import io.sigfrido45.validation.AbstractTypeValidator;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class Node<T> {
-    private AbstractTypeValidation<T> data;
+    private AbstractTypeValidator<T> typeValidation;
     private List<Node> nodes = new ArrayList<>();
 
     public static <T> Node<T> build() {
         return (new Node<>());
     }
 
-    public Node<T> setValidation(AbstractTypeValidation<T> data) {
-        this.data = data;
+    public Node<T> setValidation(AbstractTypeValidator<T> data) {
+        this.typeValidation = data;
         return this;
     }
 
@@ -24,8 +24,8 @@ public class Node<T> {
         return this;
     }
 
-    public AbstractTypeValidation<T> getData() {
-        return data;
+    public AbstractTypeValidator<T> getTypeValidation() {
+        return typeValidation;
     }
 
     public List<Node> getNodes() {

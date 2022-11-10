@@ -1,17 +1,17 @@
 package io.sigfrido45.validation;
 
-import io.sigfrido45.interfaces.Interval;
-import io.sigfrido45.interfaces.Presence;
+import io.sigfrido45.validation.actions.Interval;
+import io.sigfrido45.validation.actions.Presence;
 
-public class StringValidationAbstractType extends AbstractTypeValidation<String> implements Presence<String>, Interval<String> {
+public class StringTypeValidator extends AbstractTypeValidator<String> implements Presence<String>, Interval<String> {
 
 
-    public StringValidationAbstractType(String attrName) {
+    public StringTypeValidator(String attrName) {
         super(attrName, String.class);
     }
 
     @Override
-    public StringValidationAbstractType required(boolean required) {
+    public StringTypeValidator required(boolean required) {
         validationFunctions.add(
                 () -> {
                     if (_value == null)
@@ -23,7 +23,7 @@ public class StringValidationAbstractType extends AbstractTypeValidation<String>
     }
 
     @Override
-    public StringValidationAbstractType nullable(boolean nullable) {
+    public StringTypeValidator nullable(boolean nullable) {
         if (nullable) {
             continueValidating = false;
         }
@@ -31,7 +31,7 @@ public class StringValidationAbstractType extends AbstractTypeValidation<String>
     }
 
     @Override
-    public StringValidationAbstractType min(int min) {
+    public StringTypeValidator min(int min) {
         if (continueValidating) {
             validationFunctions.add(
                     () -> {
@@ -45,7 +45,7 @@ public class StringValidationAbstractType extends AbstractTypeValidation<String>
     }
 
     @Override
-    public StringValidationAbstractType max(int max) {
+    public StringTypeValidator max(int max) {
         if (continueValidating) {
             validationFunctions.add(
                     () -> {

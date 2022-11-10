@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-public abstract class AbstractTypeValidation<T> implements TypeValidator<T> {
+public abstract class AbstractTypeValidator<T> implements TypeValidator<T> {
 
     protected Object value;
     protected T _value;
@@ -14,7 +14,7 @@ public abstract class AbstractTypeValidation<T> implements TypeValidator<T> {
     protected String attrName;
     protected List<Supplier<Error>> validationFunctions;
 
-    public AbstractTypeValidation(String attrName, Class<T> clazz) {
+    public AbstractTypeValidator(String attrName, Class<T> clazz) {
         this.attrName = attrName;
         errors = new ArrayList<>();
         isValid = false;

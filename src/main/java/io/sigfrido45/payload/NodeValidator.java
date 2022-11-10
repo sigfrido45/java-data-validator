@@ -1,4 +1,7 @@
-package io.sigfrido45.tree;
+package io.sigfrido45.payload;
+
+import io.sigfrido45.tree.Node;
+import io.sigfrido45.tree.NodeResponse;
 
 import java.util.HashMap;
 import java.util.List;
@@ -24,15 +27,15 @@ public class NodeValidator {
 
         for (Node<?> node : nodes) {
 
-            var extractedData = data instanceof Map ? ((Map<?, ?>) data).get(node.getData().getAttrName()) : data;
-            node.getData().setValue(extractedData);
-            node.getData().validate();
+            var extractedData = data instanceof Map ? ((Map<?, ?>) data).get(node.getTypeValidation().getAttrName()) : data;
+            node.getTypeValidation().setValue(extractedData);
+            node.getTypeValidation().validate();
 
-            var atr = (attr.isEmpty() ? attr : attr + ".") + node.getData().getAttrName();
-            if (node.getData().isValid()) {
-                validated.put(node.getData().getAttrName(), node.getData().validated());
+            var atr = (attr.isEmpty() ? attr : attr + ".") + node.getTypeValidation().getAttrName();
+            if (node.getTypeValidation().isValid()) {
+                validated.put(node.getTypeValidation().getAttrName(), node.getTypeValidation().validated());
             } else {
-                errors.put(atr, node.getData().errors());
+                errors.put(atr, node.getTypeValidation().errors());
             }
 
             validate(node.getNodes(), extractedData, atr);
