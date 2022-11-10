@@ -1,17 +1,17 @@
-package org.example.asd;
+package io.sigfrido45.validation;
 
-import org.example.interfaces.Presence;
+import io.sigfrido45.interfaces.Presence;
 
 import java.util.Map;
 
-public class MapVal extends ValtType<Map> implements Presence<Map> {
+public class MapValidationAbstractType extends AbstractTypeValidation<Map> implements Presence<Map> {
 
-    public MapVal(String attrName) {
+    public MapValidationAbstractType(String attrName) {
         super(attrName, Map.class);
     }
 
     @Override
-    public ValtType<Map> required(boolean required) {
+    public AbstractTypeValidation<Map> required(boolean required) {
         validationFunctions.add(
                 () -> {
                     if (_value == null)
@@ -23,7 +23,7 @@ public class MapVal extends ValtType<Map> implements Presence<Map> {
     }
 
     @Override
-    public ValtType<Map> nullable(boolean nullable) {
+    public AbstractTypeValidation<Map> nullable(boolean nullable) {
         if (nullable) {
             continueValidating = false;
         }

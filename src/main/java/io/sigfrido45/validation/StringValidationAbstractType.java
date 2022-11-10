@@ -1,18 +1,17 @@
-package org.example.asd;
+package io.sigfrido45.validation;
 
-import org.example.interfaces.Complex;
-import org.example.interfaces.Interval;
-import org.example.interfaces.Presence;
+import io.sigfrido45.interfaces.Interval;
+import io.sigfrido45.interfaces.Presence;
 
-public class StrVal extends ValtType<String> implements Presence<String>, Interval<String>, Complex<String> {
+public class StringValidationAbstractType extends AbstractTypeValidation<String> implements Presence<String>, Interval<String> {
 
 
-    public StrVal(String attrName) {
+    public StringValidationAbstractType(String attrName) {
         super(attrName, String.class);
     }
 
     @Override
-    public StrVal required(boolean required) {
+    public StringValidationAbstractType required(boolean required) {
         validationFunctions.add(
                 () -> {
                     if (_value == null)
@@ -24,7 +23,7 @@ public class StrVal extends ValtType<String> implements Presence<String>, Interv
     }
 
     @Override
-    public StrVal nullable(boolean nullable) {
+    public StringValidationAbstractType nullable(boolean nullable) {
         if (nullable) {
             continueValidating = false;
         }
@@ -32,7 +31,7 @@ public class StrVal extends ValtType<String> implements Presence<String>, Interv
     }
 
     @Override
-    public StrVal min(int min) {
+    public StringValidationAbstractType min(int min) {
         if (continueValidating) {
             validationFunctions.add(
                     () -> {
@@ -46,7 +45,7 @@ public class StrVal extends ValtType<String> implements Presence<String>, Interv
     }
 
     @Override
-    public StrVal max(int max) {
+    public StringValidationAbstractType max(int max) {
         if (continueValidating) {
             validationFunctions.add(
                     () -> {
@@ -59,18 +58,4 @@ public class StrVal extends ValtType<String> implements Presence<String>, Interv
         return this;
     }
 
-    @Override
-    public StrVal add(ValtType<String> another) {
-        if (continueValidating) {
-            validationFunctions.add(
-                    () -> {
-                        another.validate();
-                        if (another.isValid())
-                            return null;
-                        return another.errors();
-                    }
-            );
-        }
-        return this;
-    }
 }

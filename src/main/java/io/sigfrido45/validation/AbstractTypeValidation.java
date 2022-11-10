@@ -1,29 +1,31 @@
-package org.example.asd;
+package io.sigfrido45.validation;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Supplier;
 
-public abstract class ValtType<T> implements ValtCt<T> {
+public abstract class AbstractTypeValidation<T> implements TypeValidator<T> {
 
     protected Object value;
     protected T _value;
-    protected Map<Object, Object> errors;
+    protected List<String> errors;
     protected boolean isValid;
     protected boolean continueValidating;
     protected String attrName;
-    protected List<Supplier<Object>> validationFunctions;
+    protected List<Supplier<Error>> validationFunctions;
 
-    public ValtType(String attrName, Class<T> clazz) {
+    public AbstractTypeValidation(String attrName, Class<T> clazz) {
         this.attrName = attrName;
-        errors = new HashMap<>();
+        errors = new ArrayList<>();
         isValid = false;
         continueValidating = true;
         validationFunctions = new ArrayList<>() {{
             add(() -> validateCast(clazz));
         }};
+    }
+
+    public String getAttrName() {
+        return attrName;
     }
 
     public void setValue(Object value) {
@@ -32,13 +34,10 @@ public abstract class ValtType<T> implements ValtCt<T> {
 
     @Override
     public void validate() {
-        for (Supplier<Object> validationFunction : validationFunctions) {
+        for (Supplier<Error> validationFunction : validationFunctions) {
             var error = validationFunction.get();
             if (error != null) {
-                if (error instanceof Error)
-                    errors.put(attrName, ((Error) error).asList());
-                if (error instanceof Map)
-                    errors.put(attrName, error);
+                errors.add(error.getMessage());
                 break;
             }
         }
@@ -50,7 +49,7 @@ public abstract class ValtType<T> implements ValtCt<T> {
     }
 
     @Override
-    public Map<Object, Object> errors() {
+    public List<String> errors() {
         return errors;
     }
 
