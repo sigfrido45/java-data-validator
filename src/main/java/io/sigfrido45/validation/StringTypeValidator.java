@@ -15,7 +15,9 @@ public class StringTypeValidator extends AbstractTypeValidator<String> implement
         validationFunctions.add(
                 () -> {
                     if (_value == null)
-                        return new Error("null");
+                        return new Error(
+                                getMsg("validation.required", getAttr(attrName))
+                        );
                     return null;
                 }
         );
@@ -36,7 +38,9 @@ public class StringTypeValidator extends AbstractTypeValidator<String> implement
             validationFunctions.add(
                     () -> {
                         if (_value.length() <= min)
-                            return new Error("min validation");
+                            return new Error(
+                                    getMsg("validation.str.min", getAttr(attrName), String.valueOf(min))
+                            );
                         return null;
                     }
             );
@@ -50,7 +54,9 @@ public class StringTypeValidator extends AbstractTypeValidator<String> implement
             validationFunctions.add(
                     () -> {
                         if (_value.length() >= max)
-                            return new Error("max validation");
+                            return new Error(
+                                    getMsg("validation.str.max", getAttr(attrName), String.valueOf(max))
+                            );
                         return null;
                     }
             );

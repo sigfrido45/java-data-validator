@@ -15,7 +15,9 @@ public class MapTypeValidator extends AbstractTypeValidator<Map> implements Pres
         validationFunctions.add(
                 () -> {
                     if (_value == null)
-                        return new Error("null");
+                        return new Error(
+                                getMsg("validation.required", getAttr(attrName))
+                        );
                     return null;
                 }
         );
