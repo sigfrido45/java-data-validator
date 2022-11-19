@@ -11,14 +11,16 @@ import java.util.Map;
 public class Main {
     public static void main(String[] args) {
 
-        System.getProperties().setProperty("validation.error-messages", "messages_es.properties");
-        System.getProperties().setProperty("validation.attributes-messages", "attributes_es.properties");
+        System.getProperties()
+                .setProperty("validation.error-messages", "messages_es.properties");
+        System.getProperties()
+                .setProperty("validation.attributes-messages", "attributes_es.properties");
 
         var payload = new HashMap<>() {{
             put("name", "123");
-            put("another", new HashMap<>() {{
-                put("name", "lmao");
-            }});
+//            put("another", new HashMap<>() {{
+//                put("name", "lmao");
+//            }});
         }};
 
 
@@ -28,17 +30,17 @@ public class Main {
                                 .setValidation(
                                         TypeValidator.str("name")
                                                 .required(true)
-                                                .min(10)
+                                                .min(1)
                                 )
                 )
                 .addNode(
                         Node.<Map>build()
-                                .setValidation(TypeValidator.map("another"))
+                                .setValidation(TypeValidator.map("another").required(false))
                                 .addNode(
                                         Node.<String>build()
                                                 .setValidation(
                                                         TypeValidator.str("name")
-                                                                .required(true)
+                                                                .required(false)
                                                                 .min(1)
                                                 )
                                 )

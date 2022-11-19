@@ -53,6 +53,7 @@ public class ValidationMsgReader {
         try {
             return this.getClass().getClassLoader().getResourceAsStream(resource);
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }

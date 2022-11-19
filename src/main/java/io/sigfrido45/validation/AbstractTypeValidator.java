@@ -34,7 +34,7 @@ public abstract class AbstractTypeValidator<T> implements TypeValidator<T> {
     }
 
 
-    public void setValue(Object value) {
+    public void setValue(Object value) { //we dont save value we save value info
         this.value = value;
     }
 
