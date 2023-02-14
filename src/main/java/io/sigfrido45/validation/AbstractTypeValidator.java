@@ -1,8 +1,9 @@
 package io.sigfrido45.validation;
 
+import io.sigfrido45.messages.ValidationMsgReader;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.function.Supplier;
 
 public abstract class AbstractTypeValidator<T> implements TypeValidator<T> {
@@ -13,32 +14,27 @@ public abstract class AbstractTypeValidator<T> implements TypeValidator<T> {
     protected boolean continueValidating;
     protected String attrName;
     protected List<Supplier<Error>> validationFunctions;
-    private Properties properties;
-
+    private final ValidationMsgReader msgReader;
 
     public AbstractTypeValidator(String attrName, Class<T> clazz) {
         this.attrName = attrName;
         errors = new ArrayList<>();
         continueValidating = true;
+        this.msgReader = new ValidationMsgReader(
+                System.getProperty("validator.error-messages"),
+                System.getProperty("validator.attributes-messages")
+        );
         validationFunctions = new ArrayList<>() {{
             add(() -> validateCast(clazz));
         }};
-
     }
 
     public String getAttrName() {
         return attrName;
     }
 
-    public void setMessagesFile(String resourcesPath) {
 
-    }
-
-    public void setAttributesFile(String resourcesPath) {
-
-    }
-
-    public void setValue(Object value) {
+    public void setValue(Object value) { //we dont save value we save value info
         this.value = value;
     }
 
@@ -68,19 +64,24 @@ public abstract class AbstractTypeValidator<T> implements TypeValidator<T> {
         return _value;
     }
 
-
     protected String getMsg(String code, String... args) {
-
+        var msg = msgReader.getMsg(code);
         for (int i = 0; i < args.length; i++) {
-
+            msg = msg.replace("{" + i + "}", args[i]);
         }
-        return "asd";
+        return msg;
+    }
+
+    protected String getAttr(String attr) {
+        return msgReader.getProperty(attr, attr);
     }
 
     private Error validateCast(Class<T> clazz) {
         if (value != null) {
             _value = getCasted(clazz, value);
-            return _value != null ? null : new Error("casted error");
+            return _value != null ? null : new Error(
+                    getMsg("validation.type", getAttr(attrName))
+            );
         }
         return null;
     }
