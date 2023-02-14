@@ -20,7 +20,7 @@ public class Main {
         var node = (Node.<Map>build())
                 .addNode(
                         Node.<String>build()
-                                .setValidation(
+                                .setValidator(
                                         TypeValidator.str("name")
                                                 .required(true)
                                                 .min(1)
@@ -28,10 +28,10 @@ public class Main {
                 )
                 .addNode(
                         Node.<Map>build()
-                                .setValidation(TypeValidator.map("another"))
+                                .setValidator(TypeValidator.map("another"))
                                 .addNode(
                                         Node.<String>build()
-                                                .setValidation(
+                                                .setValidator(
                                                         TypeValidator.str("name")
                                                                 .required(true)
                                                                 .min(1)

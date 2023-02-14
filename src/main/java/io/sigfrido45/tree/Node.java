@@ -14,7 +14,7 @@ public class Node<T> {
         return (new Node<>());
     }
 
-    public Node<T> setValidation(AbstractTypeValidator<T> data) {
+    public Node<T> setValidator(AbstractTypeValidator<T> data) {
         this.typeValidation = data;
         return this;
     }

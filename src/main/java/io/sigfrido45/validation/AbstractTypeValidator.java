@@ -23,17 +23,20 @@ public abstract class AbstractTypeValidator<T> implements TypeValidator<T> {
         validationFunctions = new ArrayList<>() {{
             add(() -> validateCast(clazz));
         }};
-        setProperties(System.getProperties());
+
     }
 
     public String getAttrName() {
         return attrName;
     }
 
-    public void setProperties(Properties properties) {
-        this.properties = properties;
+    public void setMessagesFile(String resourcesPath) {
+
     }
 
+    public void setAttributesFile(String resourcesPath) {
+
+    }
 
     public void setValue(Object value) {
         this.value = value;
@@ -67,6 +70,10 @@ public abstract class AbstractTypeValidator<T> implements TypeValidator<T> {
 
 
     protected String getMsg(String code, String... args) {
+
+        for (int i = 0; i < args.length; i++) {
+
+        }
         return "asd";
     }
 
