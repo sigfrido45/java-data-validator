@@ -19,7 +19,6 @@ public class StringTypeValidator extends AbstractTypeValidator<String> implement
         return null;
       }
     );
-
     return this;
   }
 

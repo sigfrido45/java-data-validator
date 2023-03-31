@@ -18,7 +18,7 @@ public class NodeValidator {
   public static <T> NodeResponse validateNode(ParentNode<?> node, Map<Object, Object> data) {
     var validator = new NodeValidator();
 
-    validator.validate(node.getChildNodes(), data, "");
+    validator.validate(node.getChildNodes(), data, node.getLabel());
     return new NodeResponse(validator.validated, validator.errors);
   }
 
@@ -30,13 +30,13 @@ public class NodeValidator {
   private void validate(List<Node<?>> nodes, Object data, String attr) {
 
     for (Node<?> node : nodes) {
-      var newAttr = (attr.isEmpty() ? attr : attr + ".") + node.getTypeValidation().getAttrName();
 
       if (node instanceof ParentNode<?> newParentNode) {
+        var newAttr = (attr.isEmpty() ? attr : attr + ".") + newParentNode.getLabel();
         if (data instanceof Map<?, ?> newData) {
           validate(
             newParentNode.getChildNodes(),
-            newData.get(newParentNode.getTypeValidation().getAttrName()),
+            newData.get(newParentNode.getLabel()),
             newAttr
           );
         } else {
@@ -45,6 +45,7 @@ public class NodeValidator {
       }
 
       if (node instanceof ChildNode<?> childNode) {
+        var newAttr = (attr.isEmpty() ? attr : attr + ".") + childNode.getTypeValidation().getAttrName();
         var nodeValidator = childNode.getTypeValidation();
         var valueInfo = getValueInfo(data, nodeValidator.getAttrName());
         nodeValidator.setValueInfo(valueInfo);

@@ -27,6 +27,10 @@ public abstract class AbstractTypeValidator<T> {
     return attrName;
   }
 
+  public void setAttrName(String attrName) {
+    this.attrName = attrName;
+  }
+
   public void setValueInfo(ValueInfo valueInfo) {
     this.valueInfo = valueInfo;
   }

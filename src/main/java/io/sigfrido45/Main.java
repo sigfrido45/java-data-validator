@@ -3,33 +3,40 @@ package io.sigfrido45;
 import io.sigfrido45.payload.NodeValidator;
 import io.sigfrido45.payload.TypeValidator;
 import io.sigfrido45.tree.ChildNode;
-import io.sigfrido45.tree.Node;
 import io.sigfrido45.tree.ParentNode;
-import io.sigfrido45.validation.MapTypeValidator;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
-
-import static io.sigfrido45.tree.Node.build;
 
 public class Main {
   public static void main(String[] args) {
 
     var payload = new HashMap<>() {{
-      put("name", "");
+      put("name", "13");
+      put("quantity", "2");
       put("another", new HashMap<>() {{
-        put("name", "lmao");
+        put("lmao", "lmao");
       }});
     }};
 
-    var parentNode = new ParentNode<Map<String, Object>>();
+    var parentNode = new ParentNode<Map<String, Object>>("person");
 
     parentNode
       .addNode(
         new ChildNode<String>().setValidator(
           TypeValidator.str("name").ifPresent().cast().required(true).min(1)
         )
+      )
+      .addNode(
+        new ChildNode<Long>().setValidator(
+          TypeValidator.long_("quantity").ifPresent().cast().required(true).max(5)
+        )
+      )
+      .addNode(
+        (new ParentNode<Map<String, Object>>("another"))
+          .addNode(
+            new ChildNode<String>().setValidator(TypeValidator.str("lmao").ifPresent().cast().required(true).min(10))
+          )
       );
 
 
