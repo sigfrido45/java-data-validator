@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class ValueInfo<T> {
-    private T value;
+public class ValueInfo {
+    private Object value;
     private boolean isPresent;
 }

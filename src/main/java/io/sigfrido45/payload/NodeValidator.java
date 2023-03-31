@@ -1,7 +1,10 @@
 package io.sigfrido45.payload;
 
+import io.sigfrido45.tree.ChildNode;
 import io.sigfrido45.tree.Node;
 import io.sigfrido45.tree.NodeResponse;
+import io.sigfrido45.tree.ParentNode;
+import io.sigfrido45.validation.ValueInfo;
 
 import java.util.HashMap;
 import java.util.List;
@@ -9,36 +12,57 @@ import java.util.Map;
 
 public class NodeValidator {
 
-    private final Map<Object, Object> validated;
-    private final Map<Object, Object> errors;
+  private final Map<Object, Object> validated;
+  private final Map<Object, Object> errors;
 
-    public static <T> NodeResponse validateNode(Node<T> node, Map<Object, Object> data) {
-        var validator = new NodeValidator();
-        validator.validate(node.getNodes(), data, "");
-        return new NodeResponse(validator.validated, validator.errors);
-    }
+  public static <T> NodeResponse validateNode(ParentNode<?> node, Map<Object, Object> data) {
+    var validator = new NodeValidator();
 
-    private NodeValidator() {
-        errors = new HashMap<>();
-        validated = new HashMap<>();
-    }
+    validator.validate(node.getChildNodes(), data, "");
+    return new NodeResponse(validator.validated, validator.errors);
+  }
 
-    private void validate(List<Node> nodes, Object data, String attr) {
+  private NodeValidator() {
+    errors = new HashMap<>();
+    validated = new HashMap<>();
+  }
 
-        for (Node<?> node : nodes) {
+  private void validate(List<Node<?>> nodes, Object data, String attr) {
 
-            var extractedData = data instanceof Map ? ((Map<?, ?>) data).get(node.getTypeValidation().getAttrName()) : data;
-            node.getTypeValidation().setValue(extractedData);
-            node.getTypeValidation().validate();
+    for (Node<?> node : nodes) {
+      var newAttr = (attr.isEmpty() ? attr : attr + ".") + node.getTypeValidation().getAttrName();
 
-            var atr = (attr.isEmpty() ? attr : attr + ".") + node.getTypeValidation().getAttrName();
-            if (node.getTypeValidation().isValid()) {
-                validated.put(node.getTypeValidation().getAttrName(), node.getTypeValidation().validated());
-            } else {
-                errors.put(atr, node.getTypeValidation().errors());
-            }
-
-            validate(node.getNodes(), extractedData, atr);
+      if (node instanceof ParentNode<?> newParentNode) {
+        if (data instanceof Map<?, ?> newData) {
+          validate(
+            newParentNode.getChildNodes(),
+            newData.get(newParentNode.getTypeValidation().getAttrName()),
+            newAttr
+          );
+        } else {
+          validate(newParentNode.getChildNodes(), data, newAttr);
         }
+      }
+
+      if (node instanceof ChildNode<?> childNode) {
+        var nodeValidator = childNode.getTypeValidation();
+        var valueInfo = getValueInfo(data, nodeValidator.getAttrName());
+        nodeValidator.setValueInfo(valueInfo);
+        nodeValidator.validate();
+
+        if (nodeValidator.isValid()) {
+          validated.put(nodeValidator.getAttrName(), nodeValidator.validated());
+        } else {
+          errors.put(newAttr, node.getTypeValidation().errors());
+        }
+      }
     }
+  }
+
+  private ValueInfo getValueInfo(Object data, String attrName) {
+    if (data instanceof Map newData) {
+      return new ValueInfo(newData.get(attrName), newData.containsKey(attrName));
+    }
+    return new ValueInfo(data, true);
+  }
 }
