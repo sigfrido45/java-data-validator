@@ -1,17 +1,20 @@
 package io.sigfrido45.validation;
 
-import io.sigfrido45.payload.NodeMapValidator;
-import io.sigfrido45.tree.ChildNode;
+import io.sigfrido45.payload.NodeValidator;
+import io.sigfrido45.tree.Node;
 import io.sigfrido45.tree.ParentNode;
 import io.sigfrido45.validation.actions.Iterable;
 import io.sigfrido45.validation.actions.Presence;
 
 import java.util.*;
 
-public class ListTypeValidator extends AbstractTypeValidator<List<Map<Object, Object>>> implements Presence<List<Map<Object, Object>>>, TypeValidator<List<Map<Object, Object>>>, Iterable<List<Map<Object, Object>>> {
+public class ListTypeValidator extends AbstractTypeValidator<List<Object>> implements Presence<List<Object>>, TypeValidator<List<Object>>, Iterable<List<Object>> {
 
-  public ListTypeValidator(String attrName) {
+  private final Class<?> clazz;
+
+  public ListTypeValidator(String attrName, Class<?> clazz) {
     super(attrName);
+    this.clazz = clazz;
   }
 
   @Override
@@ -68,32 +71,12 @@ public class ListTypeValidator extends AbstractTypeValidator<List<Map<Object, Ob
       () -> {
         if (continueValidating) {
           for (int i = 0; i < _value.size(); i++) {
-            var res = NodeMapValidator.validateNode(schemaNode, _value.get(i));
+            var res = NodeValidator.validateNode(schemaNode.getChildNodes(), _value.get(i));
             if (res.isValid()) {
               _value.set(i, res.getValidated());
             } else {
-              return new Error(getMsg("validation.list", getAttr(attrName), String.valueOf(i + 1)));
-            }
-          }
-          return null;
-        }
-        return null;
-      }
-    );
-    return this;
-  }
-
-  @Override
-  public ListTypeValidator forEach(ChildNode<?> schemaNode) {
-    validationFunctions.add(
-      () -> {
-        if (continueValidating) {
-          for (int i = 0; i < _value.size(); i++) {
-            var res = NodeMapValidator.validateNode(schemaNode, _value.get(i));
-            if (res.isValid()) {
-              _value.set(i, res.getValidated());
-            } else {
-              return new Error(getMsg("validation.list", getAttr(attrName), String.valueOf(i + 1)));
+              System.out.println("no valid "  + res.getErrors());
+              return new Error(getMsg("validation.list " + res.getErrors().get(0), getAttr(attrName), String.valueOf(i + 1)));
             }
           }
           return null;
@@ -111,19 +94,15 @@ public class ListTypeValidator extends AbstractTypeValidator<List<Map<Object, Ob
     );
   }
 
-  private List<Map<Object, Object>> getCasted(Object value) {
+  private List<Object> getCasted(Object value) {
     try {
       var newList = (List<?>) value;
-      var another = new ArrayList<Map<Object, Object>>();
+      var another = new ArrayList<>();
       for (Object v : newList) {
-        if (v instanceof Map<?,?> mapped) {
-          another.add(new HashMap<>(mapped));
-        } else {
-          throw new RuntimeException("Element is not a map ");
-        }
+        another.add(clazz.cast(v));
       }
       return another;
-    } catch (Exception E) {
+    } catch (Exception e) {
       return null;
     }
   }

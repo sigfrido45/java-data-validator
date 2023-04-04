@@ -12,6 +12,10 @@ public class ParentNode<T> extends Node<T> {
     this.label = label;
   }
 
+  public ParentNode() {
+    label = "";
+  }
+
   public List<Node<?>> getChildNodes() {
     return nodes;
   }

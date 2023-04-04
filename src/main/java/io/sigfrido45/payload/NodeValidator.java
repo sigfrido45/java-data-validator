@@ -11,26 +11,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class NodeMapValidator {
+public class NodeValidator {
 
   private final Map<Object, Object> validated;
   private final Map<Object, Object> errors;
 
+  public static NodeResponse validateNode(List<Node<?>> nodes, Object data) {
+    var validator = new NodeValidator();
+    validator.validate(nodes, data, "");
+    return new NodeResponse(validator.validated, validator.errors);
+  }
+
   public static NodeResponse validateNode(ParentNode<?> node, Object data) {
-    var validator = new NodeMapValidator();
+    var validator = new NodeValidator();
     validator.validate(node.getChildNodes(), data, node.getLabel());
     return new NodeResponse(validator.validated, validator.errors);
   }
 
-  public static NodeResponse validateNode(ChildNode<?> node, Object data) {
-    var validator = new NodeMapValidator();
-    validator.validate(new ArrayList<>() {{
-      add(node);
-    }}, data, node.getTypeValidation().getAttrName());
-    return new NodeResponse(validator.validated, validator.errors);
-  }
-
-  private NodeMapValidator() {
+  private NodeValidator() {
     errors = new HashMap<>();
     validated = new HashMap<>();
   }
@@ -69,7 +67,7 @@ public class NodeMapValidator {
   }
 
   private ValueInfo getValueInfo(Object data, String attrName) {
-    if (data instanceof Map newData) {
+    if (data instanceof Map<?, ?> newData) {
       return new ValueInfo(newData.get(attrName), newData.containsKey(attrName));
     }
     return new ValueInfo(data, true);

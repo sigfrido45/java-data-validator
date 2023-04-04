@@ -15,7 +15,7 @@ public class TypeValidator {
     return new LongTypeValidator(attrName);
   }
 
-  public static ListTypeValidator list(String attrName) {
-    return new ListTypeValidator(attrName);
+  public static ListTypeValidator list(String attrName, Class<?> clazz) {
+    return new ListTypeValidator(attrName, clazz);
   }
 }
