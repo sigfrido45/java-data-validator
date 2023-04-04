@@ -20,4 +20,8 @@ public class NodeResponse {
     public Map<Object, Object> getErrors() {
         return errors;
     }
+
+    public boolean isValid() {
+        return errors.isEmpty();
+    }
 }

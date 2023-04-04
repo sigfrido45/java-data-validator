@@ -6,23 +6,31 @@ import io.sigfrido45.tree.NodeResponse;
 import io.sigfrido45.tree.ParentNode;
 import io.sigfrido45.validation.ValueInfo;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class NodeValidator {
+public class NodeMapValidator {
 
   private final Map<Object, Object> validated;
   private final Map<Object, Object> errors;
 
-  public static <T> NodeResponse validateNode(ParentNode<?> node, Map<Object, Object> data) {
-    var validator = new NodeValidator();
-
+  public static NodeResponse validateNode(ParentNode<?> node, Object data) {
+    var validator = new NodeMapValidator();
     validator.validate(node.getChildNodes(), data, node.getLabel());
     return new NodeResponse(validator.validated, validator.errors);
   }
 
-  private NodeValidator() {
+  public static NodeResponse validateNode(ChildNode<?> node, Object data) {
+    var validator = new NodeMapValidator();
+    validator.validate(new ArrayList<>() {{
+      add(node);
+    }}, data, node.getTypeValidation().getAttrName());
+    return new NodeResponse(validator.validated, validator.errors);
+  }
+
+  private NodeMapValidator() {
     errors = new HashMap<>();
     validated = new HashMap<>();
   }
