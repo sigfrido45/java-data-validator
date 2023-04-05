@@ -25,9 +25,13 @@ public class Main {
 
     var listSchema = TypeValidator.list("persons", Map.class)
       .cast().forEach(
-        (ParentNode<?>) new ParentNode<Map<String, Object>>().addNode(
-          new ChildNode<String>().setValidator(TypeValidator.str("name").ifPresent().required(true).min(2))
-        )
+        (ParentNode<?>) new ParentNode<Map<String, Object>>()
+          .addNode(
+            new ChildNode<String>().setValidator(TypeValidator.str("name").present(true).cast().min(2))
+          )
+          .addNode(
+            new ChildNode<Long>().setValidator(TypeValidator.long_("number").present(true).cast().min(3))
+          )
       );
 
     parentNode

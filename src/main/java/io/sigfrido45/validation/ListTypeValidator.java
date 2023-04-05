@@ -1,7 +1,6 @@
 package io.sigfrido45.validation;
 
 import io.sigfrido45.payload.NodeValidator;
-import io.sigfrido45.tree.Node;
 import io.sigfrido45.tree.ParentNode;
 import io.sigfrido45.validation.actions.Iterable;
 import io.sigfrido45.validation.actions.Presence;
@@ -30,38 +29,14 @@ public class ListTypeValidator extends AbstractTypeValidator<List<Object>> imple
   }
 
   @Override
-  public ListTypeValidator ifPresent() {
-    validationFunctions.add(
-      () -> {
-        continueValidating = valueInfo.isPresent();
-        return null;
-      }
-    );
-    return this;
-  }
-
-  @Override
-  public ListTypeValidator required(boolean required) {
-    validationFunctions.add(
-      () -> {
-        if (continueValidating && required && (Objects.isNull(_value) || !valueInfo.isPresent()))
-          return new Error(getMsg("validation.required", getAttr(attrName)));
-        return null;
-      }
-    );
+  public ListTypeValidator present(boolean present) {
+    validationFunctions.add(presentValidationFunction(present));
     return this;
   }
 
   @Override
   public ListTypeValidator nullable(boolean nullable) {
-    validationFunctions.add(
-      () -> {
-        if (nullable && Objects.isNull(valueInfo.getValue())) {
-          continueValidating = false;
-        }
-        return null;
-      }
-    );
+    validationFunctions.add(nullableValidationFunction(nullable));
     return this;
   }
 
@@ -75,7 +50,7 @@ public class ListTypeValidator extends AbstractTypeValidator<List<Object>> imple
             if (res.isValid()) {
               _value.set(i, res.getValidated());
             } else {
-              System.out.println("no valid "  + res.getErrors());
+              System.out.println("no valid " + res.getErrors());
               return new Error(getMsg("validation.list " + res.getErrors().get(0), getAttr(attrName), String.valueOf(i + 1)));
             }
           }

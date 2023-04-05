@@ -12,38 +12,14 @@ public class StringTypeValidator extends AbstractTypeValidator<String> implement
   }
 
   @Override
-  public StringTypeValidator ifPresent() {
-    validationFunctions.add(
-      () -> {
-        continueValidating = valueInfo.isPresent();
-        return null;
-      }
-    );
-    return this;
-  }
-
-  @Override
-  public StringTypeValidator required(boolean required) {
-    validationFunctions.add(
-      () -> {
-        if (continueValidating && required && (Objects.isNull(_value) || !valueInfo.isPresent()))
-          return new Error(getMsg("validation.required", getAttr(attrName)));
-        return null;
-      }
-    );
+  public StringTypeValidator present(boolean present) {
+    validationFunctions.add(presentValidationFunction(present));
     return this;
   }
 
   @Override
   public StringTypeValidator nullable(boolean nullable) {
-    validationFunctions.add(
-      () -> {
-        if (nullable && Objects.isNull(valueInfo.getValue())) {
-          continueValidating = false;
-        }
-        return null;
-      }
-    );
+    validationFunctions.add(nullableValidationFunction(nullable));
     return this;
   }
 

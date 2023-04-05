@@ -4,9 +4,7 @@ import io.sigfrido45.validation.AbstractTypeValidator;
 
 public interface Presence<T> {
 
-  AbstractTypeValidator<T> ifPresent();
-
-  AbstractTypeValidator<T> required(boolean required);
+  AbstractTypeValidator<T> present(boolean present);
 
   AbstractTypeValidator<T> nullable(boolean nullable);
 }

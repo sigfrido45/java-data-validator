@@ -52,38 +52,14 @@ public class LongTypeValidator extends AbstractTypeValidator<Long> implements Pr
   }
 
   @Override
-  public LongTypeValidator ifPresent() {
-    validationFunctions.add(
-      () -> {
-        continueValidating = valueInfo.isPresent();
-        return null;
-      }
-    );
-    return this;
-  }
-
-  @Override
-  public LongTypeValidator required(boolean required) {
-    validationFunctions.add(
-      () -> {
-        if (continueValidating && required && (Objects.isNull(_value) || !valueInfo.isPresent()))
-          return new Error(getMsg("validation.required", getAttr(attrName)));
-        return null;
-      }
-    );
+  public LongTypeValidator present(boolean present) {
+    validationFunctions.add(presentValidationFunction(present));
     return this;
   }
 
   @Override
   public LongTypeValidator nullable(boolean nullable) {
-    validationFunctions.add(
-      () -> {
-        if (nullable && Objects.isNull(valueInfo.getValue())) {
-          continueValidating = false;
-        }
-        return null;
-      }
-    );
+    validationFunctions.add(nullableValidationFunction(nullable));
     return this;
   }
 

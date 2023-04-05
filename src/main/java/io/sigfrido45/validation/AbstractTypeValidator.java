@@ -4,6 +4,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 public abstract class AbstractTypeValidator<T> {
@@ -75,5 +76,26 @@ public abstract class AbstractTypeValidator<T> {
     return "attr:" + attr;
   }
 
+  protected Supplier<Error> presentValidationFunction(boolean present) {
+    return () -> {
+      if (continueValidating && present && !valueInfo.isPresent()) {
+        return new Error("validation.presence");
+      } else if (continueValidating && !present && !valueInfo.isPresent()) {
+        continueValidating = false;
+      }
+      return null;
+    };
+  }
+
+  protected Supplier<Error> nullableValidationFunction(boolean nullable) {
+    return () -> {
+      if (continueValidating && nullable && Objects.isNull(valueInfo.getValue())) {
+        continueValidating = false;
+      } else if (continueValidating && !nullable && Objects.isNull(valueInfo.getValue())) {
+        return new Error("validation.nullable");
+      }
+      return null;
+    };
+  }
 
 }

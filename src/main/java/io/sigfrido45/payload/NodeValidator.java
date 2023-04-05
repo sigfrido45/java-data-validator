@@ -58,7 +58,9 @@ public class NodeValidator {
         nodeValidator.validate();
 
         if (nodeValidator.isValid()) {
-          validated.put(nodeValidator.getAttrName(), nodeValidator.validated());
+          if (valueInfo.isPresent()) {
+            validated.put(nodeValidator.getAttrName(), nodeValidator.validated());
+          }
         } else {
           errors.put(newAttr, node.getTypeValidation().errors());
         }
