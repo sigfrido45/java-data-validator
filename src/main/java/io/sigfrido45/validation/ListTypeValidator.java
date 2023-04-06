@@ -1,15 +1,25 @@
 package io.sigfrido45.validation;
 
 import io.sigfrido45.payload.NodeValidator;
+import io.sigfrido45.tree.ChildNode;
+import io.sigfrido45.tree.Node;
 import io.sigfrido45.tree.ParentNode;
 import io.sigfrido45.validation.actions.Iterable;
 import io.sigfrido45.validation.actions.Presence;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class ListTypeValidator extends AbstractTypeValidator<List<Object>> implements Presence<List<Object>>, TypeValidator<List<Object>>, Iterable<List<Object>> {
 
   private final Class<?> clazz;
+
+  public ListTypeValidator(Class<?> clazz) {
+    super();
+    this.clazz = clazz;
+  }
 
   public ListTypeValidator(String attrName, Class<?> clazz) {
     super(attrName);
@@ -41,20 +51,38 @@ public class ListTypeValidator extends AbstractTypeValidator<List<Object>> imple
   }
 
   @Override
-  public ListTypeValidator forEach(ParentNode<?> schemaNode) {
+  public ListTypeValidator forEach(Node<?> schemaNode) {
     validationFunctions.add(
       () -> {
         if (continueValidating) {
           for (int i = 0; i < _value.size(); i++) {
-            var res = NodeValidator.validateNode(schemaNode.getChildNodes(), _value.get(i));
-            if (res.isValid()) {
-              _value.set(i, res.getValidated());
-            } else {
-              System.out.println("no valid " + res.getErrors());
-              return new Error(getMsg("validation.list " + res.getErrors().get(0), getAttr(attrName), String.valueOf(i + 1)));
+
+            if (schemaNode instanceof ParentNode<?> parentNode) {
+              var res = NodeValidator.validateNode(parentNode.getChildNodes(), _value.get(i));
+              if (res.isValid()) {
+                if (!res.getValidated().isEmpty()) {
+                  _value.set(i, res.getValidated());
+                }
+              } else {
+                System.out.println("error "+ res.getErrors());
+                return new Error(getMsg("validation.list " + res.getErrors().get(0), getAttr(attrName), String.valueOf(i + 1)));
+              }
+            }
+
+            if (schemaNode instanceof ChildNode<?> childNode) {
+              var childNodes = new ArrayList<Node<?>>();
+              childNodes.add(childNode);
+              var res = NodeValidator.validateNode(childNodes, _value.get(i));
+              if (res.isValid()) {
+                if (!res.getValidated().isEmpty()) {
+                  _value.set(i, res.getValidated().values().toArray()[0]);
+                }
+              } else {
+                System.out.println("error "+ res.getErrors());
+                return new Error(getMsg("validation.list " + res.getErrors().get(0), getAttr(attrName), String.valueOf(i + 1)));
+              }
             }
           }
-          return null;
         }
         return null;
       }

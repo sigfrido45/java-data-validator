@@ -1,11 +1,13 @@
 package io.sigfrido45.validation;
 
-import io.sigfrido45.validation.actions.Interval;
+import io.sigfrido45.validation.actions.IntInterval;
 import io.sigfrido45.validation.actions.Presence;
 
-import java.util.Objects;
+public class StringTypeValidator extends AbstractTypeValidator<String> implements Presence<String>, IntInterval<String>, TypeValidator<String> {
 
-public class StringTypeValidator extends AbstractTypeValidator<String> implements Presence<String>, Interval<String>, TypeValidator<String> {
+  public StringTypeValidator() {
+    super();
+  }
 
   public StringTypeValidator(String attrName) {
     super(attrName);
@@ -64,17 +66,25 @@ public class StringTypeValidator extends AbstractTypeValidator<String> implement
   }
 
   private Error validateCast() {
-    _value = getCasted(valueInfo.getValue());
-    return _value != null ? null : new Error(
+    var castedInfo = getCasted(valueInfo.getValue());
+    if (castedInfo.isValid()) {
+      _value = castedInfo.getCasted();
+      return null;
+    }
+    return new Error(
       getMsg("validation.type", getAttr(attrName))
     );
   }
 
-  private String getCasted(Object value) {
-    try {
-      return String.class.cast(value);
-    } catch (Exception E) {
-      return null;
+  private CastInfo<String> getCasted(Object value) {
+    var castedInfo = new CastInfo<String>();
+    var strVal = String.valueOf(value);
+    if (strVal.equalsIgnoreCase("null")) {
+      castedInfo.setCasted(null);
+    } else {
+      castedInfo.setCasted(strVal);
     }
+    castedInfo.setValid(true);
+    return castedInfo;
   }
 }

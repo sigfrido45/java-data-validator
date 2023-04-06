@@ -1,5 +1,7 @@
 package io.sigfrido45.validation;
 
+import lombok.Data;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,6 +21,13 @@ public abstract class AbstractTypeValidator<T> {
 
   public AbstractTypeValidator(String attrName) {
     this.attrName = attrName;
+    errors = new ArrayList<>();
+    continueValidating = true;
+    validationFunctions = new ArrayList<>();
+  }
+
+  public AbstractTypeValidator() {
+    this.attrName = "";
     errors = new ArrayList<>();
     continueValidating = true;
     validationFunctions = new ArrayList<>();

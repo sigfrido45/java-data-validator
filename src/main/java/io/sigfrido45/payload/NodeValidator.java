@@ -51,7 +51,6 @@ public class NodeValidator {
       }
 
       if (node instanceof ChildNode<?> childNode) {
-        var newAttr = (attr.isEmpty() ? attr : attr + ".") + childNode.getTypeValidation().getAttrName();
         var nodeValidator = childNode.getTypeValidation();
         var valueInfo = getValueInfo(data, nodeValidator.getAttrName());
         nodeValidator.setValueInfo(valueInfo);
@@ -62,7 +61,8 @@ public class NodeValidator {
             validated.put(nodeValidator.getAttrName(), nodeValidator.validated());
           }
         } else {
-          errors.put(newAttr, node.getTypeValidation().errors());
+          var errorAttr = (attr.isEmpty() ? attr : attr + ".") + childNode.getTypeValidation().getAttrName();
+          errors.put(errorAttr, node.getTypeValidation().errors());
         }
       }
     }

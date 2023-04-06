@@ -1,20 +1,20 @@
 package io.sigfrido45.validation;
 
-import io.sigfrido45.validation.actions.LongInterval;
+import io.sigfrido45.validation.actions.IntInterval;
 import io.sigfrido45.validation.actions.Presence;
 
-public class LongTypeValidator extends AbstractTypeValidator<Long> implements Presence<Long>, LongInterval<Long>, TypeValidator<Long> {
+public class IntTypeValidator extends AbstractTypeValidator<Integer> implements Presence<Integer>, IntInterval<Integer>, TypeValidator<Integer> {
 
-  public LongTypeValidator(String attrName) {
+  public IntTypeValidator(String attrName) {
     super(attrName);
   }
 
-  public LongTypeValidator() {
+  public IntTypeValidator() {
     super();
   }
 
   @Override
-  public LongTypeValidator cast() {
+  public IntTypeValidator cast() {
     validationFunctions.add(
       () -> {
         if (continueValidating)
@@ -26,12 +26,12 @@ public class LongTypeValidator extends AbstractTypeValidator<Long> implements Pr
   }
 
   @Override
-  public LongTypeValidator min(Long min) {
+  public IntTypeValidator min(int min) {
     validationFunctions.add(
       () -> {
         if (continueValidating && _value <= min)
           return new Error(
-            getMsg("validation.long.min", getAttr(attrName), String.valueOf(min))
+            getMsg("validation.str.min", getAttr(attrName), String.valueOf(min))
           );
         return null;
       }
@@ -40,12 +40,12 @@ public class LongTypeValidator extends AbstractTypeValidator<Long> implements Pr
   }
 
   @Override
-  public LongTypeValidator max(Long max) {
+  public IntTypeValidator max(int max) {
     validationFunctions.add(
       () -> {
         if (continueValidating && _value >= max)
           return new Error(
-            getMsg("validation.long.min", getAttr(attrName), String.valueOf(max))
+            getMsg("validation.str.max", getAttr(attrName), String.valueOf(max))
           );
         return null;
       }
@@ -54,13 +54,13 @@ public class LongTypeValidator extends AbstractTypeValidator<Long> implements Pr
   }
 
   @Override
-  public LongTypeValidator present(boolean present) {
+  public IntTypeValidator present(boolean present) {
     validationFunctions.add(presentValidationFunction(present));
     return this;
   }
 
   @Override
-  public LongTypeValidator nullable(boolean nullable) {
+  public IntTypeValidator nullable(boolean nullable) {
     validationFunctions.add(nullableValidationFunction(nullable));
     return this;
   }
@@ -76,15 +76,15 @@ public class LongTypeValidator extends AbstractTypeValidator<Long> implements Pr
     );
   }
 
-  private CastInfo<Long> getCasted(Object value) {
-    var castedInfo = new CastInfo<Long>();
+  private CastInfo<Integer> getCasted(Object value) {
+    var castedInfo = new CastInfo<Integer>();
     var strValue = String.valueOf(value);
     if (strValue.equalsIgnoreCase("null")) {
       castedInfo.setCasted(null);
       castedInfo.setValid(true);
     } else {
       try {
-        castedInfo.setCasted(Long.valueOf(strValue));
+        castedInfo.setCasted(Integer.valueOf(strValue));
         castedInfo.setValid(true);
       } catch (Exception e) {
         castedInfo.setValid(false);

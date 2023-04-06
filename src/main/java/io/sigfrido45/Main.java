@@ -14,32 +14,27 @@ public class Main {
   public static void main(String[] args) {
 
     var payload = new HashMap<>() {{
-      put("persons", new ArrayList<>() {{
-        add(new HashMap<>() {{
-          put("name", "123");
-        }});
+      put("numbers", new ArrayList<>() {{
+        add(1);
+        add("2");
+        add(null);
       }});
     }};
 
-    var parentNode = new ParentNode<Map<String, Object>>("data");
-
-    var listSchema = TypeValidator.list("persons", Map.class)
-      .cast().forEach(
-        (ParentNode<?>) new ParentNode<Map<String, Object>>()
-          .addNode(
-            new ChildNode<String>().setValidator(TypeValidator.str("name").present(true).cast().min(2))
-          )
-          .addNode(
-            new ChildNode<Long>().setValidator(TypeValidator.long_("number").present(true).cast().min(3))
-          )
-      );
-
-    parentNode
+    var node = ParentNode.<Map<String, Object>>build("data")
       .addNode(
-        new ChildNode<List<Object>>().setValidator(listSchema)
+        ChildNode.<List<Object>>build()
+          .setValidator(
+            TypeValidator.list("numbers", Integer.class).present(true).nullable(false).cast()
+              .forEach(
+                ChildNode.<Integer>build().setValidator(
+                  TypeValidator.int_().present(true).nullable(false).cast()
+                )
+              )
+          )
       );
 
-    var nodeValidator = NodeValidator.validateNode(parentNode, payload);
+    var nodeValidator = NodeValidator.validateNode((ParentNode<?>) node, payload);
     System.out.println(nodeValidator.getErrors());
     System.out.println(nodeValidator.getValidated());
   }
