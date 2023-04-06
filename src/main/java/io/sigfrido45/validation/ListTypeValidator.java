@@ -64,7 +64,6 @@ public class ListTypeValidator extends AbstractTypeValidator<List<Object>> imple
                   _value.set(i, res.getValidated());
                 }
               } else {
-                System.out.println("error "+ res.getErrors());
                 return new Error(getMsg("validation.list " + res.getErrors().get(0), getAttr(attrName), String.valueOf(i + 1)));
               }
             }
@@ -78,7 +77,6 @@ public class ListTypeValidator extends AbstractTypeValidator<List<Object>> imple
                   _value.set(i, res.getValidated().values().toArray()[0]);
                 }
               } else {
-                System.out.println("error "+ res.getErrors());
                 return new Error(getMsg("validation.list " + res.getErrors().get(0), getAttr(attrName), String.valueOf(i + 1)));
               }
             }
@@ -101,9 +99,7 @@ public class ListTypeValidator extends AbstractTypeValidator<List<Object>> imple
     try {
       var newList = (List<?>) value;
       var another = new ArrayList<>();
-      for (Object v : newList) {
-        another.add(clazz.cast(v));
-      }
+      another.addAll(newList);
       return another;
     } catch (Exception e) {
       return null;
