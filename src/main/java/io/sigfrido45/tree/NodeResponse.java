@@ -1,15 +1,16 @@
 package io.sigfrido45.tree;
 
+import io.sigfrido45.validation.Error;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 
+import java.util.List;
 import java.util.Map;
 
 @AllArgsConstructor
 public class NodeResponse {
 
   private Map<Object, Object> validated;
-  private Map<Object, Object> errors;
+  private List<Error> errors;
 
   public Map<Object, Object> getValidated() {
     if (!isValid())
@@ -17,7 +18,7 @@ public class NodeResponse {
     return validated;
   }
 
-  public Map<Object, Object> getErrors() {
+  public List<Error> getErrors() {
     return errors;
   }
 

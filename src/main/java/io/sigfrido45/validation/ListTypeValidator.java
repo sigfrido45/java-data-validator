@@ -8,22 +8,17 @@ import io.sigfrido45.validation.actions.Iterable;
 import io.sigfrido45.validation.actions.Presence;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 public class ListTypeValidator extends AbstractTypeValidator<List<Object>> implements Presence<List<Object>>, TypeValidator<List<Object>>, Iterable<List<Object>> {
 
-  private final Class<?> clazz;
-
-  public ListTypeValidator(Class<?> clazz) {
+  public ListTypeValidator() {
     super();
-    this.clazz = clazz;
   }
 
-  public ListTypeValidator(String attrName, Class<?> clazz) {
+  public ListTypeValidator(String attrName) {
     super(attrName);
-    this.clazz = clazz;
   }
 
   @Override
@@ -55,29 +50,34 @@ public class ListTypeValidator extends AbstractTypeValidator<List<Object>> imple
     validationFunctions.add(
       () -> {
         if (continueValidating) {
+          var additionalContext = new HashMap<String, Object>();
           for (int i = 0; i < _value.size(); i++) {
-
+            if (additionalContext.containsKey("index")) {
+              additionalContext.replace("index", i);
+            } else {
+              additionalContext.put("index", i);
+            }
             if (schemaNode instanceof ParentNode<?> parentNode) {
-              var res = NodeValidator.validateNode(parentNode.getChildNodes(), _value.get(i));
+              var res = NodeValidator.validateNode(parentNode.getChildNodes(), _value.get(i), additionalContext);
               if (res.isValid()) {
                 if (!res.getValidated().isEmpty()) {
                   _value.set(i, res.getValidated());
                 }
               } else {
-                return new Error(getMsg("validation.list " + res.getErrors().get(0), getAttr(attrName), String.valueOf(i + 1)));
+                return res.getErrors().get(0);
               }
             }
 
             if (schemaNode instanceof ChildNode<?> childNode) {
               var childNodes = new ArrayList<Node<?>>();
               childNodes.add(childNode);
-              var res = NodeValidator.validateNode(childNodes, _value.get(i));
+              var res = NodeValidator.validateNode(childNodes, _value.get(i), additionalContext);
               if (res.isValid()) {
                 if (!res.getValidated().isEmpty()) {
                   _value.set(i, res.getValidated().values().toArray()[0]);
                 }
               } else {
-                return new Error(getMsg("validation.list " + res.getErrors().get(0), getAttr(attrName), String.valueOf(i + 1)));
+                return res.getErrors().get(0);
               }
             }
           }
@@ -91,7 +91,7 @@ public class ListTypeValidator extends AbstractTypeValidator<List<Object>> imple
   private Error validateCast() {
     _value = getCasted(valueInfo.getValue());
     return _value != null ? null : new Error(
-      getMsg("validation.type", getAttr(attrName))
+      attrName, getMsg("validation.type", getAttr(attrName))
     );
   }
 

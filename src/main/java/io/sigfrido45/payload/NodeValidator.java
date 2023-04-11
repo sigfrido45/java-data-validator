@@ -4,7 +4,11 @@ import io.sigfrido45.tree.ChildNode;
 import io.sigfrido45.tree.Node;
 import io.sigfrido45.tree.NodeResponse;
 import io.sigfrido45.tree.ParentNode;
+import io.sigfrido45.validation.Error;
+import io.sigfrido45.validation.MessageGetter;
 import io.sigfrido45.validation.ValueInfo;
+import lombok.AccessLevel;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,23 +18,37 @@ import java.util.Map;
 public class NodeValidator {
 
   private final Map<Object, Object> validated;
-  private final Map<Object, Object> errors;
+  private final List<Error> errors;
 
-  public static NodeResponse validateNode(List<Node<?>> nodes, Object data) {
+  @Setter(value = AccessLevel.PRIVATE)
+  private Map<String, Object> additionalContext;
+  @Setter(value = AccessLevel.PRIVATE)
+  private MessageGetter msgGetter;
+
+  public static NodeResponse validateNode(List<Node<?>> nodes, Object data, Map<String, Object> additionalContext) {
     var validator = new NodeValidator();
+    validator.setAdditionalContext(additionalContext);
     validator.validate(nodes, data, "");
     return new NodeResponse(validator.validated, validator.errors);
   }
 
-  public static NodeResponse validateNode(ParentNode<?> node, Object data) {
-    var validator = new NodeValidator();
+  public static NodeResponse validateNode(ParentNode<?> node, Object data, MessageGetter msgGetter) {
+    var validator = new NodeValidator(msgGetter);
     validator.validate(node.getChildNodes(), data, node.getLabel());
     return new NodeResponse(validator.validated, validator.errors);
   }
 
   private NodeValidator() {
-    errors = new HashMap<>();
+    errors = new ArrayList<>();
     validated = new HashMap<>();
+    additionalContext = new HashMap<>();
+  }
+
+  private NodeValidator(MessageGetter msgGetter) {
+    this.msgGetter = msgGetter;
+    errors = new ArrayList<>();
+    validated = new HashMap<>();
+    additionalContext = new HashMap<>();
   }
 
   private void validate(List<Node<?>> nodes, Object data, String attr) {
@@ -53,6 +71,8 @@ public class NodeValidator {
       if (node instanceof ChildNode<?> childNode) {
         var nodeValidator = childNode.getTypeValidation();
         var valueInfo = getValueInfo(data, nodeValidator.getAttrName());
+        nodeValidator.mergeAdditionalContext(additionalContext);
+        nodeValidator.setMsgGetter(msgGetter);
         nodeValidator.setValueInfo(valueInfo);
         nodeValidator.validate();
 
@@ -62,7 +82,7 @@ public class NodeValidator {
           }
         } else {
           var errorAttr = (attr.isEmpty() ? attr : attr + ".") + childNode.getTypeValidation().getAttrName();
-          errors.put(errorAttr, node.getTypeValidation().errors());
+          errors.add(new Error(errorAttr, node.getTypeValidation().errors().get(0)));
         }
       }
     }

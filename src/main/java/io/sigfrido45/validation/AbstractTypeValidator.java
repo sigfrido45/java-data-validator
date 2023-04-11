@@ -1,8 +1,5 @@
 package io.sigfrido45.validation;
 
-import lombok.Data;
-
-import java.text.MessageFormat;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -15,9 +12,8 @@ public abstract class AbstractTypeValidator<T> {
   protected boolean continueValidating;
   protected String attrName;
   protected List<Supplier<Error>> validationFunctions;
-  private MessageFormat msgReader;
-
   private Map<String, Object> context;
+  private MessageGetter msgGetter;
 
   public AbstractTypeValidator(String attrName) {
     initContext();
@@ -47,10 +43,9 @@ public abstract class AbstractTypeValidator<T> {
     this.valueInfo = valueInfo;
   }
 
-  public void setMsgReader(MessageFormat msgFormat) {
-    this.msgReader = msgFormat;
+  public void setMsgGetter(MessageGetter msgFormat) {
+    this.msgGetter = msgFormat;
   }
-
 
   public void validate() {
     for (Supplier<Error> validationFunction : validationFunctions) {
@@ -62,21 +57,17 @@ public abstract class AbstractTypeValidator<T> {
     }
   }
 
-
   public boolean isValid() {
     return errors.isEmpty();
   }
-
 
   public List<String> errors() {
     return errors;
   }
 
-
   public T validated() {
     return _value;
   }
-
 
   public AbstractTypeValidator<T> custom(Function<Map<String, Object>, Error> function) {
     validationFunctions.add(
@@ -90,20 +81,22 @@ public abstract class AbstractTypeValidator<T> {
     return this;
   }
 
-  protected String getMsg(String code, String... args) {
-//    return msgReader.format(code);
-    return "code: " + code + " _args: " + Arrays.toString(args);
+  public void mergeAdditionalContext(Map<String, Object> additionalContext) {
+    context.putAll(additionalContext);
   }
 
-  protected String getAttr(String attr) {
-//    return msgReader.format(attr);
-    return "attr:" + attr;
+  protected String getMsg(String code, String... args) {
+    return msgGetter.getMessage(code, args);
+  }
+
+  protected String getAttr(String code) {
+    return msgGetter.getMessage(code);
   }
 
   protected Supplier<Error> presentValidationFunction(boolean present) {
     return () -> {
       if (continueValidating && present && !valueInfo.isPresent()) {
-        return new Error("validation.presence");
+        return new Error(attrName, getMsg("validation.present", getMsg(attrName)));
       } else if (continueValidating && !present && !valueInfo.isPresent()) {
         continueValidating = false;
       }
@@ -116,7 +109,7 @@ public abstract class AbstractTypeValidator<T> {
       if (continueValidating && wantNull && Objects.isNull(valueInfo.getValue())) {
         continueValidating = false;
       } else if (continueValidating && !wantNull && Objects.isNull(valueInfo.getValue())) {
-        return new Error("validation.nullable");
+        return new Error(attrName, getMsg("validation.nullable", getMsg(attrName)));
       }
       return null;
     };
@@ -124,7 +117,6 @@ public abstract class AbstractTypeValidator<T> {
 
   private void initContext() {
     context = new HashMap<>();
-    context.put("val", this);
+    context.put("validator", this);
   }
-
 }

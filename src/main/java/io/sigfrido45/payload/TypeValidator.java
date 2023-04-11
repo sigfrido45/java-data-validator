@@ -20,12 +20,12 @@ public class TypeValidator {
     return new LongTypeValidator();
   }
 
-  public static ListTypeValidator list(String attrName, Class<?> clazz) {
-    return new ListTypeValidator(attrName, clazz);
+  public static ListTypeValidator list(String attrName) {
+    return new ListTypeValidator(attrName);
   }
 
-  public static ListTypeValidator list(Class<?> clazz) {
-    return new ListTypeValidator(clazz);
+  public static ListTypeValidator list() {
+    return new ListTypeValidator();
   }
 
   public static IntTypeValidator int_(String attrName) {

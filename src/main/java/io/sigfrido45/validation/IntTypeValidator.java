@@ -30,9 +30,7 @@ public class IntTypeValidator extends AbstractTypeValidator<Integer> implements 
     validationFunctions.add(
       () -> {
         if (continueValidating && _value <= min)
-          return new Error(
-            getMsg("validation.str.min", getAttr(attrName), String.valueOf(min))
-          );
+          return new Error(attrName, getMsg("validation.str.min", getAttr(attrName), String.valueOf(min)));
         return null;
       }
     );
@@ -44,9 +42,7 @@ public class IntTypeValidator extends AbstractTypeValidator<Integer> implements 
     validationFunctions.add(
       () -> {
         if (continueValidating && _value >= max)
-          return new Error(
-            getMsg("validation.str.max", getAttr(attrName), String.valueOf(max))
-          );
+          return new Error(attrName, getMsg("validation.str.max", getAttr(attrName), String.valueOf(max)));
         return null;
       }
     );
@@ -71,9 +67,7 @@ public class IntTypeValidator extends AbstractTypeValidator<Integer> implements 
       _value = castedInfo.getCasted();
       return null;
     }
-    return new Error(
-      getMsg("validation.type", getAttr(attrName))
-    );
+    return new Error(attrName, getMsg("validation.type", getAttr(attrName)));
   }
 
   private CastInfo<Integer> getCasted(Object value) {

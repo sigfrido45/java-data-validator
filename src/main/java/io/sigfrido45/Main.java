@@ -6,11 +6,9 @@ import io.sigfrido45.tree.ChildNode;
 import io.sigfrido45.tree.ParentNode;
 import io.sigfrido45.validation.Error;
 import io.sigfrido45.validation.IntTypeValidator;
+import io.sigfrido45.validation.MessageGetter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Main {
   public static void main(String[] args) {
@@ -27,14 +25,15 @@ public class Main {
       .addNode(
         ChildNode.<List<Object>>build()
           .setValidator(
-            TypeValidator.list("numbers", Integer.class).present(true).nullable(false).cast()
+            TypeValidator.list("numbers").present(true).nullable(false).cast()
               .forEach(
                 ChildNode.<Integer>build().setValidator(
                   TypeValidator.int_().present(true).nullable(false).cast().custom(
                     context -> {
-                      var val = (IntTypeValidator) context.get("val");
-                      System.out.println("val " + val.validated());
-                      return new Error("");
+                      var val = (IntTypeValidator) context.get("validator");
+                      System.out.println("validator " + val.validated());
+                      System.out.println("indext " + context.get("index"));
+                      return new Error("", "");
                     }
                   )
                 )
@@ -42,7 +41,19 @@ public class Main {
           )
       );
 
-    var nodeValidator = NodeValidator.validateNode((ParentNode<?>) node, payload);
+    var nodeValidator = NodeValidator.validateNode((ParentNode<?>) node, payload, new MessageGetter() {
+      @Override
+      public String getMessage(String code, String... args) {
+        System.out.println("get message " + code + " - args "+ Arrays.toString(args));
+        return "xd";
+      }
+
+      @Override
+      public String getMessage(String code) {
+        System.out.println("get message " + code);
+        return "xd";
+      }
+    });
     System.out.println(nodeValidator.getErrors());
     System.out.println(nodeValidator.getValidated());
   }
