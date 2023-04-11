@@ -7,7 +7,7 @@ import java.util.List;
 public class ParentNode<T> extends Node<T> {
 
   @Getter
-  private final String label;
+  private final String attrName;
 
   public static <K> ParentNode<K> build(String attrName) {
     return new ParentNode<>(attrName);
@@ -18,11 +18,11 @@ public class ParentNode<T> extends Node<T> {
   }
 
   public ParentNode(String label) {
-    this.label = label;
+    this.attrName = label;
   }
 
   public ParentNode() {
-    label = "";
+    attrName = "";
   }
 
   public List<Node<?>> getChildNodes() {

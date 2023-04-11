@@ -5,7 +5,6 @@ import io.sigfrido45.payload.TypeValidator;
 import io.sigfrido45.tree.ChildNode;
 import io.sigfrido45.tree.ParentNode;
 import io.sigfrido45.validation.Error;
-import io.sigfrido45.validation.IntTypeValidator;
 import io.sigfrido45.validation.MessageGetter;
 
 import java.util.*;
@@ -21,7 +20,7 @@ public class Main {
       }});
     }};
 
-    var node = ParentNode.<Map<String, Object>>build("data")
+    var node = ParentNode.<Map<String, Object>>build()
       .addNode(
         ChildNode.<List<Object>>build()
           .setValidator(
@@ -30,9 +29,6 @@ public class Main {
                 ChildNode.<Integer>build().setValidator(
                   TypeValidator.int_().present(true).nullable(false).cast().custom(
                     context -> {
-                      var val = (IntTypeValidator) context.get("validator");
-                      System.out.println("validator " + val.validated());
-                      System.out.println("indext " + context.get("index"));
                       return new Error("", "");
                     }
                   )

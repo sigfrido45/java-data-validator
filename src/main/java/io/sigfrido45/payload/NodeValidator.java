@@ -34,7 +34,7 @@ public class NodeValidator {
 
   public static NodeResponse validateNode(ParentNode<?> node, Object data, MessageGetter msgGetter) {
     var validator = new NodeValidator(msgGetter);
-    validator.validate(node.getChildNodes(), data, node.getLabel());
+    validator.validate(node.getChildNodes(), data, node.getAttrName());
     return new NodeResponse(validator.validated, validator.errors);
   }
 
@@ -56,11 +56,11 @@ public class NodeValidator {
     for (Node<?> node : nodes) {
 
       if (node instanceof ParentNode<?> newParentNode) {
-        var newAttr = (attr.isEmpty() ? attr : attr + ".") + newParentNode.getLabel();
+        var newAttr = (attr.isEmpty() ? attr : attr + ".") + newParentNode.getAttrName();
         if (data instanceof Map<?, ?> newData) {
           validate(
             newParentNode.getChildNodes(),
-            newData.get(newParentNode.getLabel()),
+            newData.get(newParentNode.getAttrName()),
             newAttr
           );
         } else {
