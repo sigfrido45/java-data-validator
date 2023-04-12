@@ -26,11 +26,11 @@ public class LongTypeValidator extends AbstractTypeValidator<Long> implements Pr
   }
 
   @Override
-  public LongTypeValidator min(Long min) {
+  public LongTypeValidator gte(Long min) {
     validationFunctions.add(
       () -> {
         if (continueValidating && _value <= min)
-          return getMsg("validation.number.min", getAttr(attrName), String.valueOf(min));
+          return getMsg("validation.number.min", getAttr(FIELD_PREFIX + attrName), String.valueOf(min));
         return null;
       }
     );
@@ -38,15 +38,25 @@ public class LongTypeValidator extends AbstractTypeValidator<Long> implements Pr
   }
 
   @Override
-  public LongTypeValidator max(Long max) {
+  public LongTypeValidator lte(Long max) {
     validationFunctions.add(
       () -> {
         if (continueValidating && _value >= max)
-          return getMsg("validation.number.max", getAttr(attrName), String.valueOf(max));
+          return getMsg("validation.number.max", getAttr(FIELD_PREFIX + attrName), String.valueOf(max));
         return null;
       }
     );
     return this;
+  }
+
+  @Override
+  public LongTypeValidator gt(Long min) {
+    return gte(min - 1);
+  }
+
+  @Override
+  public LongTypeValidator lt(Long max) {
+    return lte(max - 1);
   }
 
   @Override
@@ -67,7 +77,7 @@ public class LongTypeValidator extends AbstractTypeValidator<Long> implements Pr
       _value = castedInfo.getCasted();
       return null;
     }
-    return getMsg("validation.type", getAttr(attrName));
+    return getMsg("validation.type", getAttr(FIELD_PREFIX + attrName));
   }
 
   private CastInfo<Long> getCasted(Object value) {

@@ -26,11 +26,11 @@ public class IntTypeValidator extends AbstractTypeValidator<Integer> implements 
   }
 
   @Override
-  public IntTypeValidator min(int min) {
+  public IntTypeValidator gte(int min) {
     validationFunctions.add(
       () -> {
         if (continueValidating && _value <= min)
-          return getMsg("validation.str.min", getAttr(attrName), String.valueOf(min));
+          return getMsg("validation.string.min", getAttr(FIELD_PREFIX + attrName), String.valueOf(min));
         return null;
       }
     );
@@ -38,15 +38,25 @@ public class IntTypeValidator extends AbstractTypeValidator<Integer> implements 
   }
 
   @Override
-  public IntTypeValidator max(int max) {
+  public IntTypeValidator lte(int max) {
     validationFunctions.add(
       () -> {
         if (continueValidating && _value >= max)
-          return getMsg("validation.str.max", getAttr(attrName), String.valueOf(max));
+          return getMsg("validation.string.max", getAttr(FIELD_PREFIX + attrName), String.valueOf(max));
         return null;
       }
     );
     return this;
+  }
+
+  @Override
+  public IntTypeValidator lt(int min) {
+    return lte(min - 1);
+  }
+
+  @Override
+  public IntTypeValidator gt(int max) {
+    return gte(max - 1);
   }
 
   @Override
@@ -67,7 +77,7 @@ public class IntTypeValidator extends AbstractTypeValidator<Integer> implements 
       _value = castedInfo.getCasted();
       return null;
     }
-    return getMsg("validation.type", getAttr(attrName));
+    return getMsg("validation.type", getAttr(FIELD_PREFIX + attrName));
   }
 
   private CastInfo<Integer> getCasted(Object value) {

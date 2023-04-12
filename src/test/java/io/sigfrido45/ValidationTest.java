@@ -43,13 +43,13 @@ class ValidationTest {
     var schema = ParentNode.build()
       .addNode(
         ChildNode.<String>build().setValidator(
-          TypeValidator.str("name").present(true).nullable(false).cast().min(5)
+          TypeValidator.str("name").present(true).nullable(false).cast().gte(5)
         )
       )
       .addNode(
         ParentNode.build("another").addNode(
           ChildNode.<String>build().setValidator(
-            TypeValidator.str("name2").present(true).nullable(false).cast().min(1)
+            TypeValidator.str("name2").present(true).nullable(false).cast().gte(1)
           )
         )
       )
@@ -67,7 +67,7 @@ class ValidationTest {
           TypeValidator.list("persons").present(true).nullable(false).cast().forEach(
             ParentNode.build().addNode(
               ChildNode.<String>build().setValidator(
-                TypeValidator.str("name").present(true).nullable(false).cast().min(1)
+                TypeValidator.str("name").present(true).nullable(false).cast().gte(1)
               )
             )
           )
@@ -102,13 +102,13 @@ class ValidationTest {
     var schema = ParentNode.build()
       .addNode(
         ChildNode.<String>build().setValidator(
-          TypeValidator.str("name").present(true).nullable(false).cast().min(5)
+          TypeValidator.str("name").present(true).nullable(false).cast().gte(5)
         )
       )
       .addNode(
         ParentNode.build("another").addNode(
           ChildNode.<String>build().setValidator(
-            TypeValidator.str("name2").present(true).nullable(false).cast().min(1)
+            TypeValidator.str("name2").present(true).nullable(false).cast().gte(1)
           )
         )
       )
@@ -126,7 +126,7 @@ class ValidationTest {
           TypeValidator.list("persons").present(true).nullable(false).cast().forEach(
             ParentNode.build().addNode(
               ChildNode.<String>build().setValidator(
-                TypeValidator.str("name").present(true).nullable(false).cast().min(1)
+                TypeValidator.str("name").present(true).nullable(false).cast().gte(1)
               )
             )
           )

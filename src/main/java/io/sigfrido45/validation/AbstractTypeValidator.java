@@ -5,7 +5,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public abstract class AbstractTypeValidator<T> {
-
+  protected static final String FIELD_PREFIX = "validation.field.";
   protected ValueInfo valueInfo;
   protected T _value;
   protected List<String> errors;
@@ -100,7 +100,7 @@ public abstract class AbstractTypeValidator<T> {
   protected Supplier<String> presentValidationFunction(boolean present) {
     return () -> {
       if (continueValidating && present && !valueInfo.isPresent()) {
-        return getMsg("validation.present", getMsg(attrName));
+        return getMsg("validation.present", getAttr(FIELD_PREFIX + attrName));
       } else if (continueValidating && !present && !valueInfo.isPresent()) {
         continueValidating = false;
       }
@@ -113,7 +113,7 @@ public abstract class AbstractTypeValidator<T> {
       if (continueValidating && wantNull && Objects.isNull(valueInfo.getValue())) {
         continueValidating = false;
       } else if (continueValidating && !wantNull && Objects.isNull(valueInfo.getValue())) {
-        return getMsg("validation.nullable", getMsg(attrName));
+        return getMsg("validation.nullable", getAttr(FIELD_PREFIX + attrName));
       }
       return null;
     };

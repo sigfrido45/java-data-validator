@@ -4,6 +4,7 @@ import io.sigfrido45.payload.NodeValidator;
 import io.sigfrido45.tree.ChildNode;
 import io.sigfrido45.tree.Node;
 import io.sigfrido45.tree.ParentNode;
+import io.sigfrido45.validation.actions.IntInterval;
 import io.sigfrido45.validation.actions.Iterable;
 import io.sigfrido45.validation.actions.Presence;
 
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class ListTypeValidator extends AbstractTypeValidator<List<Object>> implements Presence<List<Object>>, TypeValidator<List<Object>>, Iterable<List<Object>> {
+public class ListTypeValidator extends AbstractTypeValidator<List<Object>> implements Presence<List<Object>>, TypeValidator<List<Object>>, Iterable<List<Object>>, IntInterval<List<Object>> {
 
   public ListTypeValidator() {
     super();
@@ -90,9 +91,43 @@ public class ListTypeValidator extends AbstractTypeValidator<List<Object>> imple
     return this;
   }
 
+  @Override
+  public ListTypeValidator gte(int min) {
+    validationFunctions.add(
+      () -> {
+        if (continueValidating && _value.size() <= min)
+          return getMsg("validation.list.min", getAttr(FIELD_PREFIX + attrName), String.valueOf(min));
+        return null;
+      }
+    );
+    return this;
+  }
+
+  @Override
+  public ListTypeValidator lte(int max) {
+    validationFunctions.add(
+      () -> {
+        if (continueValidating && _value.size() >= max)
+          return getMsg("validation.list.max", getAttr(FIELD_PREFIX + attrName), String.valueOf(max));
+        return null;
+      }
+    );
+    return this;
+  }
+
+  @Override
+  public ListTypeValidator lt(int min) {
+    return lte(min - 1);
+  }
+
+  @Override
+  public ListTypeValidator gt(int max) {
+    return gte(max - 1);
+  }
+
   private String validateCast() {
     _value = getCasted(valueInfo.getValue());
-    return _value != null ? null : getMsg("validation.type", getAttr(attrName));
+    return _value != null ? null : getMsg("validation.type", getAttr(FIELD_PREFIX + attrName));
   }
 
   private List<Object> getCasted(Object value) {
