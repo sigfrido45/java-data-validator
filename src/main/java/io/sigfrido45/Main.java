@@ -4,7 +4,6 @@ import io.sigfrido45.payload.NodeValidator;
 import io.sigfrido45.payload.TypeValidator;
 import io.sigfrido45.tree.ChildNode;
 import io.sigfrido45.tree.ParentNode;
-import io.sigfrido45.validation.Error;
 import io.sigfrido45.validation.MessageGetter;
 
 import java.util.*;
@@ -29,7 +28,7 @@ public class Main {
                 ChildNode.<Integer>build().setValidator(
                   TypeValidator.int_().present(true).nullable(false).cast().custom(
                     context -> {
-                      return new Error("", "");
+                      return "xd";
                     }
                   )
                 )
@@ -40,7 +39,7 @@ public class Main {
     var nodeValidator = NodeValidator.validateNode((ParentNode<?>) node, payload, new MessageGetter() {
       @Override
       public String getMessage(String code, String... args) {
-        System.out.println("get message " + code + " - args "+ Arrays.toString(args));
+        System.out.println("get message " + code + " - args " + Arrays.toString(args));
         return "xd";
       }
 

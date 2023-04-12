@@ -58,26 +58,28 @@ public class ListTypeValidator extends AbstractTypeValidator<List<Object>> imple
               additionalContext.put("index", i);
             }
             if (schemaNode instanceof ParentNode<?> parentNode) {
-              var res = NodeValidator.validateNode(parentNode.getChildNodes(), _value.get(i), additionalContext);
+              var res = NodeValidator.validateNode(parentNode.getChildNodes(), _value.get(i), additionalContext, getMsgGetter());
               if (res.isValid()) {
                 if (!res.getValidated().isEmpty()) {
                   _value.set(i, res.getValidated());
                 }
               } else {
-                return res.getErrors().get(0);
+                setAttrName(String.format("%s.%d.%s", attrName, i, res.getErrors().get(0).getKey()));
+                return res.getErrors().get(0).getMessage();
               }
             }
 
             if (schemaNode instanceof ChildNode<?> childNode) {
               var childNodes = new ArrayList<Node<?>>();
               childNodes.add(childNode);
-              var res = NodeValidator.validateNode(childNodes, _value.get(i), additionalContext);
+              var res = NodeValidator.validateNode(childNodes, _value.get(i), additionalContext, getMsgGetter());
               if (res.isValid()) {
                 if (!res.getValidated().isEmpty()) {
                   _value.set(i, res.getValidated().values().toArray()[0]);
                 }
               } else {
-                return res.getErrors().get(0);
+                setAttrName(String.format("%s.%d", attrName, i));
+                return res.getErrors().get(0).getMessage();
               }
             }
           }
@@ -88,11 +90,9 @@ public class ListTypeValidator extends AbstractTypeValidator<List<Object>> imple
     return this;
   }
 
-  private Error validateCast() {
+  private String validateCast() {
     _value = getCasted(valueInfo.getValue());
-    return _value != null ? null : new Error(
-      attrName, getMsg("validation.type", getAttr(attrName))
-    );
+    return _value != null ? null : getMsg("validation.type", getAttr(attrName));
   }
 
   private List<Object> getCasted(Object value) {

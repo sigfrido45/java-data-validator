@@ -30,7 +30,7 @@ public class LongTypeValidator extends AbstractTypeValidator<Long> implements Pr
     validationFunctions.add(
       () -> {
         if (continueValidating && _value <= min)
-          return new Error(attrName, getMsg("validation.number.min", getAttr(attrName), String.valueOf(min)));
+          return getMsg("validation.number.min", getAttr(attrName), String.valueOf(min));
         return null;
       }
     );
@@ -42,7 +42,7 @@ public class LongTypeValidator extends AbstractTypeValidator<Long> implements Pr
     validationFunctions.add(
       () -> {
         if (continueValidating && _value >= max)
-          return new Error(attrName, getMsg("validation.number.max", getAttr(attrName), String.valueOf(max)));
+          return getMsg("validation.number.max", getAttr(attrName), String.valueOf(max));
         return null;
       }
     );
@@ -61,13 +61,13 @@ public class LongTypeValidator extends AbstractTypeValidator<Long> implements Pr
     return this;
   }
 
-  private Error validateCast() {
+  private String validateCast() {
     var castedInfo = getCasted(valueInfo.getValue());
     if (castedInfo.isValid()) {
       _value = castedInfo.getCasted();
       return null;
     }
-    return new Error(attrName, getMsg("validation.type", getAttr(attrName)));
+    return getMsg("validation.type", getAttr(attrName));
   }
 
   private CastInfo<Long> getCasted(Object value) {

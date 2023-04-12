@@ -23,27 +23,59 @@ var payload = new HashMap<>() {{
 We define the schema validator for that payload like this
 
 ```java
-var node = (Node.<Map>build())
-                .addNode(
-                        Node.<String>build()
-                                .setValidation(
-                                        TypeValidator.str("name")
-                                                .required(true)
-                                                .min(1)
-                                )
-                )
-                .addNode(
-                        Node.<Map>build()
-                                .setValidation(TypeValidator.map("another"))
-                                .addNode(
-                                        Node.<String>build()
-                                                .setValidation(
-                                                        TypeValidator.str("name")
-                                                                .required(true)
-                                                                .min(1)
-                                                )
-                                )
-                );
+ var payload = new HashMap<>() {{
+      put("name", "1");
+      put("another", new HashMap<>() {{
+        put("name2", "");
+      }});
+      put("numbers", new ArrayList<>() {{
+        add("1");
+        add(2);
+        add(null);
+      }});
+      put("persons", new ArrayList<>() {{
+        add(new HashMap<>() {{
+          put("name", "hole");
+        }});
+        add(new HashMap<>() {{
+          put("name", "");
+        }});
+      }});
+    }};
+
+    var schema = ParentNode.build()
+      .addNode(
+        ChildNode.<String>build().setValidator(
+          TypeValidator.str("name").present(true).nullable(false).cast().min(5)
+        )
+      )
+      .addNode(
+        ParentNode.build("another").addNode(
+          ChildNode.<String>build().setValidator(
+            TypeValidator.str("name2").present(true).nullable(false).cast().min(1)
+          )
+        )
+      )
+      .addNode(
+        ChildNode.<List<Object>>build().setValidator(
+          TypeValidator.list("numbers").present(true).nullable(false).cast().forEach(
+            ChildNode.<Integer>build().setValidator(
+              TypeValidator.int_().present(true).nullable(false).cast()
+            )
+          )
+        )
+      )
+      .addNode(
+        ChildNode.<List<Object>>build().setValidator(
+          TypeValidator.list("persons").present(true).nullable(false).cast().forEach(
+            ParentNode.build().addNode(
+              ChildNode.<String>build().setValidator(
+                TypeValidator.str("name").present(true).nullable(false).cast().min(1)
+              )
+            )
+          )
+        )
+      );
 ```
 
 

@@ -30,7 +30,7 @@ public class StringTypeValidator extends AbstractTypeValidator<String> implement
     validationFunctions.add(
       () -> {
         if (continueValidating && _value.length() <= min)
-          return new Error(attrName, getMsg("validation.string.min", getAttr(attrName), String.valueOf(min)));
+          return getMsg("validation.string.min", getAttr(attrName), String.valueOf(min));
         return null;
       }
     );
@@ -42,7 +42,7 @@ public class StringTypeValidator extends AbstractTypeValidator<String> implement
     validationFunctions.add(
       () -> {
         if (continueValidating && _value.length() >= max)
-          return new Error(attrName, getMsg("validation.string.max", getAttr(attrName), String.valueOf(max)));
+          return getMsg("validation.string.max", getAttr(attrName), String.valueOf(max));
         return null;
       }
     );
@@ -61,13 +61,13 @@ public class StringTypeValidator extends AbstractTypeValidator<String> implement
     return this;
   }
 
-  private Error validateCast() {
+  private String validateCast() {
     var castedInfo = getCasted(valueInfo.getValue());
     if (castedInfo.isValid()) {
       _value = castedInfo.getCasted();
       return null;
     }
-    return new Error(attrName, getMsg("validation.type", getAttr(attrName)));
+    return getMsg("validation.type", getAttr(attrName));
   }
 
   private CastInfo<String> getCasted(Object value) {

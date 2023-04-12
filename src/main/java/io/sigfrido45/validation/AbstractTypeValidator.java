@@ -11,7 +11,7 @@ public abstract class AbstractTypeValidator<T> {
   protected List<String> errors;
   protected boolean continueValidating;
   protected String attrName;
-  protected List<Supplier<Error>> validationFunctions;
+  protected List<Supplier<String>> validationFunctions;
   private Map<String, Object> context;
   private MessageGetter msgGetter;
 
@@ -48,10 +48,10 @@ public abstract class AbstractTypeValidator<T> {
   }
 
   public void validate() {
-    for (Supplier<Error> validationFunction : validationFunctions) {
+    for (Supplier<String> validationFunction : validationFunctions) {
       var error = validationFunction.get();
       if (error != null) {
-        errors.add(error.getMessage());
+        errors.add(error);
         break;
       }
     }
@@ -69,7 +69,7 @@ public abstract class AbstractTypeValidator<T> {
     return _value;
   }
 
-  public AbstractTypeValidator<T> custom(Function<Map<String, Object>, Error> function) {
+  public AbstractTypeValidator<T> custom(Function<Map<String, Object>, String> function) {
     validationFunctions.add(
       () -> {
         if (continueValidating) {
@@ -93,10 +93,14 @@ public abstract class AbstractTypeValidator<T> {
     return msgGetter.getMessage(code);
   }
 
-  protected Supplier<Error> presentValidationFunction(boolean present) {
+  protected MessageGetter getMsgGetter() {
+    return msgGetter;
+  }
+
+  protected Supplier<String> presentValidationFunction(boolean present) {
     return () -> {
       if (continueValidating && present && !valueInfo.isPresent()) {
-        return new Error(attrName, getMsg("validation.present", getMsg(attrName)));
+        return getMsg("validation.present", getMsg(attrName));
       } else if (continueValidating && !present && !valueInfo.isPresent()) {
         continueValidating = false;
       }
@@ -104,12 +108,12 @@ public abstract class AbstractTypeValidator<T> {
     };
   }
 
-  protected Supplier<Error> nullableValidationFunction(boolean wantNull) {
+  protected Supplier<String> nullableValidationFunction(boolean wantNull) {
     return () -> {
       if (continueValidating && wantNull && Objects.isNull(valueInfo.getValue())) {
         continueValidating = false;
       } else if (continueValidating && !wantNull && Objects.isNull(valueInfo.getValue())) {
-        return new Error(attrName, getMsg("validation.nullable", getMsg(attrName)));
+        return getMsg("validation.nullable", getMsg(attrName));
       }
       return null;
     };

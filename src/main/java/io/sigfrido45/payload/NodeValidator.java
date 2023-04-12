@@ -25,6 +25,13 @@ public class NodeValidator {
   @Setter(value = AccessLevel.PRIVATE)
   private MessageGetter msgGetter;
 
+  public static NodeResponse validateNode(List<Node<?>> nodes, Object data, Map<String, Object> additionalContext, MessageGetter msgGetter) {
+    var validator = new NodeValidator(msgGetter);
+    validator.setAdditionalContext(additionalContext);
+    validator.validate(nodes, data, "");
+    return new NodeResponse(validator.validated, validator.errors);
+  }
+
   public static NodeResponse validateNode(List<Node<?>> nodes, Object data, Map<String, Object> additionalContext) {
     var validator = new NodeValidator();
     validator.setAdditionalContext(additionalContext);

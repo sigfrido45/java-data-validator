@@ -1,0 +1,155 @@
+package io.sigfrido45;
+
+import io.sigfrido45.payload.NodeValidator;
+import io.sigfrido45.payload.TypeValidator;
+import io.sigfrido45.tree.ChildNode;
+import io.sigfrido45.tree.ParentNode;
+import io.sigfrido45.validation.MessageGetter;
+import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class ValidationTest {
+
+
+  @Test
+  void validatePayloadError() {
+    var payload = new HashMap<>() {{
+      put("name", "1");
+      put("another", new HashMap<>() {{
+        put("name2", "");
+      }});
+      put("numbers", new ArrayList<>() {{
+        add("1");
+        add(2);
+        add(null);
+      }});
+      put("persons", new ArrayList<>() {{
+        add(new HashMap<>() {{
+          put("name", "hole");
+        }});
+        add(new HashMap<>() {{
+          put("name", "");
+        }});
+      }});
+    }};
+
+    var schema = ParentNode.build()
+      .addNode(
+        ChildNode.<String>build().setValidator(
+          TypeValidator.str("name").present(true).nullable(false).cast().min(5)
+        )
+      )
+      .addNode(
+        ParentNode.build("another").addNode(
+          ChildNode.<String>build().setValidator(
+            TypeValidator.str("name2").present(true).nullable(false).cast().min(1)
+          )
+        )
+      )
+      .addNode(
+        ChildNode.<List<Object>>build().setValidator(
+          TypeValidator.list("numbers").present(true).nullable(false).cast().forEach(
+            ChildNode.<Integer>build().setValidator(
+              TypeValidator.int_().present(true).nullable(false).cast()
+            )
+          )
+        )
+      )
+      .addNode(
+        ChildNode.<List<Object>>build().setValidator(
+          TypeValidator.list("persons").present(true).nullable(false).cast().forEach(
+            ParentNode.build().addNode(
+              ChildNode.<String>build().setValidator(
+                TypeValidator.str("name").present(true).nullable(false).cast().min(1)
+              )
+            )
+          )
+        )
+      );
+    var response = NodeValidator.validateNode((ParentNode<?>) schema, payload, new CustomMessageGetter());
+    assertFalse(response.isValid());
+    assertFalse(response.getErrors().isEmpty());
+  }
+
+  @Test
+  void validatePayloadOk() {
+    var payload = new HashMap<>() {{
+      put("name", "asdfasdf");
+      put("another", new HashMap<>() {{
+        put("name2", "asdfasd");
+      }});
+      put("numbers", new ArrayList<>() {{
+        add("1");
+        add(2);
+        add(3);
+      }});
+      put("persons", new ArrayList<>() {{
+        add(new HashMap<>() {{
+          put("name", "hole");
+        }});
+        add(new HashMap<>() {{
+          put("name", "asdfasdf");
+        }});
+      }});
+    }};
+    var schema = ParentNode.build()
+      .addNode(
+        ChildNode.<String>build().setValidator(
+          TypeValidator.str("name").present(true).nullable(false).cast().min(5)
+        )
+      )
+      .addNode(
+        ParentNode.build("another").addNode(
+          ChildNode.<String>build().setValidator(
+            TypeValidator.str("name2").present(true).nullable(false).cast().min(1)
+          )
+        )
+      )
+      .addNode(
+        ChildNode.<List<Object>>build().setValidator(
+          TypeValidator.list("numbers").present(true).nullable(false).cast().forEach(
+            ChildNode.<Integer>build().setValidator(
+              TypeValidator.int_().present(true).nullable(false).cast()
+            )
+          )
+        )
+      )
+      .addNode(
+        ChildNode.<List<Object>>build().setValidator(
+          TypeValidator.list("persons").present(true).nullable(false).cast().forEach(
+            ParentNode.build().addNode(
+              ChildNode.<String>build().setValidator(
+                TypeValidator.str("name").present(true).nullable(false).cast().min(1)
+              )
+            )
+          )
+        )
+      );
+    var response = NodeValidator.validateNode((ParentNode<?>) schema, payload, new CustomMessageGetter());
+    assertTrue(response.isValid());
+    assertTrue(response.getErrors().isEmpty());
+  }
+
+  public static class CustomMessageGetter implements MessageGetter {
+
+    @Override
+    public String getMessage(String code, String... args) {
+      System.out.println("get message " + code + " - args " + Arrays.toString(args));
+      return "xd";
+    }
+
+    @Override
+    public String getMessage(String code) {
+      System.out.println("get message " + code);
+      return "xd";
+    }
+  }
+
+}
