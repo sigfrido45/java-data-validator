@@ -5,6 +5,7 @@ import io.sigfrido45.validation.actions.Presence;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 public class StringTypeValidator extends AbstractTypeValidator<String> implements Presence<String>, IntInterval<String>, TypeValidator<String> {
 
@@ -59,7 +60,7 @@ public class StringTypeValidator extends AbstractTypeValidator<String> implement
 
   @Override
   public StringTypeValidator gt(int max) {
-    return gte(max - 1);
+    return gte(max + 1);
   }
 
   @Override
@@ -68,6 +69,28 @@ public class StringTypeValidator extends AbstractTypeValidator<String> implement
       () -> {
         if (continueValidating)
           return validateCast();
+        return null;
+      }
+    );
+    return this;
+  }
+
+  public StringTypeValidator notEmpty() {
+    validationFunctions.add(
+      () -> {
+        if (continueValidating && _value.trim().isEmpty())
+          return getMsg("validation.string.empty", getAttr(FIELD_PREFIX + attrName));
+        return null;
+      }
+    );
+    return this;
+  }
+
+  public StringTypeValidator regex(Pattern pattern) {
+    validationFunctions.add(
+      () -> {
+        if (continueValidating && !pattern.matcher(_value).matches())
+          return getMsg("validation.string.regex", getAttr(FIELD_PREFIX + attrName));
         return null;
       }
     );

@@ -122,7 +122,7 @@ public class ListTypeValidator extends AbstractTypeValidator<List<Object>> imple
 
   @Override
   public ListTypeValidator gt(int max) {
-    return gte(max - 1);
+    return gte(max + 1);
   }
 
   private String validateCast() {

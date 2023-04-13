@@ -137,6 +137,28 @@ class ValidationTest {
     assertTrue(response.getErrors().isEmpty());
   }
 
+  @Test
+  public void another() {
+    var payload = new HashMap<>() {{
+      put("email", "");
+      put("password", "123");
+    }};
+    var schema = ParentNode.build()
+      .addNode(
+        ChildNode.<String>build().setValidator(
+          TypeValidator.str("email").present(true).nullable(false).cast().lt(100).gte(0)
+        )
+      )
+      .addNode(
+        ChildNode.<String>build().setValidator(
+          TypeValidator.str("password").present(true).nullable(false).cast().lt(100).gt(0)
+        )
+      );
+
+    var response = NodeValidator.validateNode((ParentNode<?>) schema, payload, new CustomMessageGetter());
+    assertFalse(response.isValid());
+  }
+
   public static class CustomMessageGetter implements MessageGetter {
 
     @Override

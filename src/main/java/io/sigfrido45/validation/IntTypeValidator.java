@@ -56,7 +56,7 @@ public class IntTypeValidator extends AbstractTypeValidator<Integer> implements 
 
   @Override
   public IntTypeValidator gt(int max) {
-    return gte(max - 1);
+    return gte(max + 1);
   }
 
   @Override
