@@ -77,12 +77,14 @@ public class ListReactiveValidator extends AbstractTypeValidator<List<Object>> i
     reactiveValidationFunctions.add(() -> {
       if (continueValidating) {
         var tmpList = new ArrayList<ElemInfo>();
+
         for (int i = 0; i < _value.size(); i++) {
-          tmpList.add(new ElemInfo(Integer.valueOf(i), _value.get(i)));
+          tmpList.add(new ElemInfo(i, _value.get(i)));
         }
 
         return Flux.fromIterable(tmpList)
           .flatMap(elemInfo -> {
+
             var i = elemInfo.getIndex();
             var additionalContext = new HashMap<String, Object>();
             additionalContext.put("index", i);
@@ -122,11 +124,10 @@ public class ListReactiveValidator extends AbstractTypeValidator<List<Object>> i
             return Mono.just(AbstractTypeValidator.NULL_STR_VALUE);
           })
           .collectList()
-          .map(errors -> {
-            return errors.stream().filter(x -> !x.equalsIgnoreCase(AbstractTypeValidator.NULL_STR_VALUE))
-              .findFirst()
-              .orElse(AbstractTypeValidator.NULL_STR_VALUE);
-          });
+          .map(errors -> errors.stream().filter(x -> !x.equalsIgnoreCase(AbstractTypeValidator.NULL_STR_VALUE))
+            .findFirst()
+            .orElse(AbstractTypeValidator.NULL_STR_VALUE)
+          );
       }
       return Mono.fromCallable(() -> AbstractTypeValidator.NULL_STR_VALUE);
     });
@@ -149,7 +150,7 @@ public class ListReactiveValidator extends AbstractTypeValidator<List<Object>> i
   @Data
   @AllArgsConstructor
   private static class ElemInfo {
-    private Integer index;
+    private int index;
     private Object value;
   }
 }
