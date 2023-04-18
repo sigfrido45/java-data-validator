@@ -1,17 +1,21 @@
 package io.sigfrido45.validation;
 
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public abstract class AbstractTypeValidator<T> {
-  protected static final String FIELD_PREFIX = "validation.field.";
+  public static final String FIELD_PREFIX = "validation.field.";
   protected ValueInfo valueInfo;
   protected T _value;
   protected List<String> errors;
   protected boolean continueValidating;
   protected String attrName;
   protected List<Supplier<String>> validationFunctions;
+  protected List<Supplier<Mono<String>>> asyncValidationFunctions;
   private Map<String, Object> context;
   private MessageGetter msgGetter;
 
@@ -21,6 +25,7 @@ public abstract class AbstractTypeValidator<T> {
     errors = new ArrayList<>();
     continueValidating = true;
     validationFunctions = new ArrayList<>();
+    asyncValidationFunctions = new ArrayList<>();
   }
 
   public AbstractTypeValidator() {
@@ -29,6 +34,7 @@ public abstract class AbstractTypeValidator<T> {
     errors = new ArrayList<>();
     continueValidating = true;
     validationFunctions = new ArrayList<>();
+    asyncValidationFunctions = new ArrayList<>();
   }
 
   public String getAttrName() {
@@ -57,6 +63,17 @@ public abstract class AbstractTypeValidator<T> {
     }
   }
 
+  public Mono<Void> validateAsync() {
+    return Flux.fromIterable(asyncValidationFunctions)
+      .flatMap(Supplier::get)
+      .takeUntil(Objects::nonNull)
+      .collectList()
+      .flatMap(errs -> {
+        errors.addAll(errs);
+        return Mono.empty();
+      });
+  }
+
   public boolean isValid() {
     return errors.isEmpty();
   }
@@ -71,6 +88,18 @@ public abstract class AbstractTypeValidator<T> {
 
   public AbstractTypeValidator<T> custom(Function<Map<String, Object>, String> function) {
     validationFunctions.add(
+      () -> {
+        if (continueValidating) {
+          return function.apply(context);
+        }
+        return null;
+      }
+    );
+    return this;
+  }
+
+  public AbstractTypeValidator<T> customAsync(Function<Map<String, Object>, Mono<String>> function) {
+    asyncValidationFunctions.add(
       () -> {
         if (continueValidating) {
           return function.apply(context);
@@ -108,6 +137,17 @@ public abstract class AbstractTypeValidator<T> {
     };
   }
 
+  protected Supplier<Mono<String>> presentAsyncValidationFunction(boolean present) {
+    return () -> Mono.fromCallable(() -> {
+      if (continueValidating && present && !valueInfo.isPresent()) {
+        return getMsg("validation.present", getAttr(FIELD_PREFIX + attrName));
+      } else if (continueValidating && !present && !valueInfo.isPresent()) {
+        continueValidating = false;
+      }
+      return null;
+    });
+  }
+
   protected Supplier<String> nullableValidationFunction(boolean wantNull) {
     return () -> {
       if (continueValidating && wantNull && Objects.isNull(valueInfo.getValue())) {
@@ -117,6 +157,26 @@ public abstract class AbstractTypeValidator<T> {
       }
       return null;
     };
+  }
+
+  protected Supplier<Mono<String>> nullableAsyncValidationFunction(boolean wantNull) {
+    return () -> Mono.fromCallable(() -> {
+      if (continueValidating && wantNull && Objects.isNull(valueInfo.getValue())) {
+        continueValidating = false;
+      } else if (continueValidating && !wantNull && Objects.isNull(valueInfo.getValue())) {
+        return getMsg("validation.nullable", getAttr(FIELD_PREFIX + attrName));
+      }
+      return null;
+    });
+  }
+
+
+  protected String validateCast(CastInfo<T> castedInfo) {
+    if (castedInfo.isValid()) {
+      _value = castedInfo.getCasted();
+      return null;
+    }
+    return getMsg("validation.type", getAttr(FIELD_PREFIX + attrName));
   }
 
   private void initContext() {

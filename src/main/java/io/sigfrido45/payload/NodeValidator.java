@@ -20,9 +20,9 @@ public class NodeValidator {
   private final Map<Object, Object> validated;
   private final List<Error> errors;
 
-  @Setter(value = AccessLevel.PRIVATE)
+  @Setter(AccessLevel.PRIVATE)
   private Map<String, Object> additionalContext;
-  @Setter(value = AccessLevel.PRIVATE)
+  @Setter(AccessLevel.PRIVATE)
   private MessageGetter msgGetter;
 
   public static NodeResponse validateNode(List<Node<?>> nodes, Object data, Map<String, Object> additionalContext, MessageGetter msgGetter) {

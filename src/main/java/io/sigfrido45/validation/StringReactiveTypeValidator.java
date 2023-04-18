@@ -1,0 +1,124 @@
+package io.sigfrido45.validation;
+
+import io.sigfrido45.validation.actions.IntInterval;
+import io.sigfrido45.validation.actions.Presence;
+import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.regex.Pattern;
+
+public class StringReactiveTypeValidator extends AbstractTypeValidator<String> implements Presence<String>, IntInterval<String>, TypeValidator<String> {
+
+  public StringReactiveTypeValidator() {
+    super();
+  }
+
+  public StringReactiveTypeValidator(String attrName) {
+    super(attrName);
+  }
+
+
+  @Override
+  public StringReactiveTypeValidator cast() {
+    asyncValidationFunctions.add(() ->
+      Mono.fromCallable(() -> {
+        if (continueValidating)
+          return validateCast(ValidationTypeUtil.getStringCastInfo(valueInfo.getValue()));
+        return null;
+      })
+    );
+    return this;
+  }
+
+  @Override
+  public StringReactiveTypeValidator gte(int min) {
+    asyncValidationFunctions.add(() ->
+      Mono.fromCallable(() -> {
+        if (continueValidating && _value.length() <= min)
+          return getMsg("validation.string.min", getAttr(FIELD_PREFIX + attrName), String.valueOf(min));
+        return null;
+      })
+    );
+    return this;
+  }
+
+  @Override
+  public StringReactiveTypeValidator lte(int max) {
+    asyncValidationFunctions.add(() ->
+      Mono.fromCallable(() -> {
+        if (continueValidating && _value.length() >= max)
+          return getMsg("validation.string.max", getAttr(FIELD_PREFIX + attrName), String.valueOf(max));
+        return null;
+      })
+    );
+    return this;
+  }
+
+  @Override
+  public StringReactiveTypeValidator lt(int min) {
+    return lte(min - 1);
+  }
+
+  @Override
+  public StringReactiveTypeValidator gt(int max) {
+    return gte(max + 1);
+  }
+
+  @Override
+  public StringReactiveTypeValidator present(boolean present) {
+    asyncValidationFunctions.add(presentAsyncValidationFunction(present));
+    return this;
+  }
+
+  @Override
+  public StringReactiveTypeValidator nullable(boolean nullable) {
+    asyncValidationFunctions.add(nullableAsyncValidationFunction(nullable));
+    return this;
+  }
+
+  public StringReactiveTypeValidator regex(Pattern pattern) {
+    asyncValidationFunctions.add(() ->
+      Mono.fromCallable(() -> {
+        if (continueValidating && !pattern.matcher(_value).matches())
+          return getMsg("validation.string.regex", getAttr(FIELD_PREFIX + attrName));
+        return null;
+      })
+    );
+    return this;
+  }
+
+  public StringReactiveTypeValidator notEmpty() {
+    asyncValidationFunctions.add(() ->
+      Mono.fromCallable(() -> {
+        if (continueValidating && _value.trim().isEmpty())
+          return getMsg("validation.string.empty", getAttr(FIELD_PREFIX + attrName));
+        return null;
+      })
+    );
+    return this;
+  }
+
+  public StringReactiveTypeValidator in(String commaSeparated) {
+    return in(commaSeparated.split(","));
+  }
+
+  public StringReactiveTypeValidator in(String[] args) {
+    return in(List.of(args));
+  }
+
+  public StringReactiveTypeValidator in(List<String> args) {
+    asyncValidationFunctions.add(() ->
+      Mono.fromCallable(() -> {
+        if (continueValidating) {
+          var find = args.stream().filter(a -> a.equalsIgnoreCase(_value)).findFirst().orElse(null);
+          if (Objects.isNull(find)) {
+            return getMsg("validation.string.in", getAttr(FIELD_PREFIX + attrName), String.join(",", args));
+          }
+        }
+        return null;
+      })
+    );
+    return this;
+  }
+}

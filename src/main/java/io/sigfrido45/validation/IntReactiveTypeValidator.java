@@ -2,71 +2,72 @@ package io.sigfrido45.validation;
 
 import io.sigfrido45.validation.actions.IntInterval;
 import io.sigfrido45.validation.actions.Presence;
+import reactor.core.publisher.Mono;
 
-public class IntTypeValidator extends AbstractTypeValidator<Integer> implements Presence<Integer>, IntInterval<Integer>, TypeValidator<Integer> {
+public class IntReactiveTypeValidator extends AbstractTypeValidator<Integer> implements Presence<Integer>, IntInterval<Integer>, TypeValidator<Integer> {
 
-  public IntTypeValidator(String attrName) {
+  public IntReactiveTypeValidator(String attrName) {
     super(attrName);
   }
 
-  public IntTypeValidator() {
+  public IntReactiveTypeValidator() {
     super();
   }
 
   @Override
-  public IntTypeValidator cast() {
-    validationFunctions.add(
-      () -> {
+  public IntReactiveTypeValidator cast() {
+    asyncValidationFunctions.add(() ->
+      Mono.fromCallable(() -> {
         if (continueValidating)
           return validateCast(ValidationTypeUtil.getIntCastInfo(valueInfo.getValue()));
         return null;
-      }
+      })
     );
     return this;
   }
 
   @Override
-  public IntTypeValidator gte(int min) {
-    validationFunctions.add(
-      () -> {
+  public IntReactiveTypeValidator gte(int min) {
+    asyncValidationFunctions.add(() ->
+      Mono.fromCallable(() -> {
         if (continueValidating && _value <= min)
           return getMsg("validation.string.min", getAttr(FIELD_PREFIX + attrName), String.valueOf(min));
         return null;
-      }
+      })
     );
     return this;
   }
 
   @Override
-  public IntTypeValidator lte(int max) {
-    validationFunctions.add(
-      () -> {
+  public IntReactiveTypeValidator lte(int max) {
+    asyncValidationFunctions.add(() ->
+      Mono.fromCallable(() -> {
         if (continueValidating && _value >= max)
           return getMsg("validation.string.max", getAttr(FIELD_PREFIX + attrName), String.valueOf(max));
         return null;
-      }
+      })
     );
     return this;
   }
 
   @Override
-  public IntTypeValidator lt(int min) {
+  public IntReactiveTypeValidator lt(int min) {
     return lte(min - 1);
   }
 
   @Override
-  public IntTypeValidator gt(int max) {
+  public IntReactiveTypeValidator gt(int max) {
     return gte(max + 1);
   }
 
   @Override
-  public IntTypeValidator present(boolean present) {
-    validationFunctions.add(presentValidationFunction(present));
+  public IntReactiveTypeValidator present(boolean present) {
+    asyncValidationFunctions.add(presentAsyncValidationFunction(present));
     return this;
   }
 
   @Override
-  public IntTypeValidator nullable(boolean nullable) {
+  public IntReactiveTypeValidator nullable(boolean nullable) {
     validationFunctions.add(nullableValidationFunction(nullable));
     return this;
   }

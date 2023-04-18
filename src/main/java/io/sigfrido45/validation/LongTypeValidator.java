@@ -18,7 +18,7 @@ public class LongTypeValidator extends AbstractTypeValidator<Long> implements Pr
     validationFunctions.add(
       () -> {
         if (continueValidating)
-          return validateCast();
+          return validateCast(ValidationTypeUtil.getLongCastInfo(valueInfo.getValue()));
         return null;
       }
     );
@@ -69,31 +69,5 @@ public class LongTypeValidator extends AbstractTypeValidator<Long> implements Pr
   public LongTypeValidator nullable(boolean nullable) {
     validationFunctions.add(nullableValidationFunction(nullable));
     return this;
-  }
-
-  private String validateCast() {
-    var castedInfo = getCasted(valueInfo.getValue());
-    if (castedInfo.isValid()) {
-      _value = castedInfo.getCasted();
-      return null;
-    }
-    return getMsg("validation.type", getAttr(FIELD_PREFIX + attrName));
-  }
-
-  private CastInfo<Long> getCasted(Object value) {
-    var castedInfo = new CastInfo<Long>();
-    var strValue = String.valueOf(value);
-    if (strValue.equalsIgnoreCase("null")) {
-      castedInfo.setCasted(null);
-      castedInfo.setValid(true);
-    } else {
-      try {
-        castedInfo.setCasted(Long.valueOf(strValue));
-        castedInfo.setValid(true);
-      } catch (Exception e) {
-        castedInfo.setValid(false);
-      }
-    }
-    return castedInfo;
   }
 }

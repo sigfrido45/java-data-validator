@@ -27,7 +27,7 @@ public class ListTypeValidator extends AbstractTypeValidator<List<Object>> imple
     validationFunctions.add(
       () -> {
         if (continueValidating)
-          return validateCast();
+          return validateCast(ValidationTypeUtil.getListCastInfo(valueInfo.getValue()));
         return null;
       }
     );
@@ -123,21 +123,5 @@ public class ListTypeValidator extends AbstractTypeValidator<List<Object>> imple
   @Override
   public ListTypeValidator gt(int max) {
     return gte(max + 1);
-  }
-
-  private String validateCast() {
-    _value = getCasted(valueInfo.getValue());
-    return _value != null ? null : getMsg("validation.type", getAttr(FIELD_PREFIX + attrName));
-  }
-
-  private List<Object> getCasted(Object value) {
-    try {
-      var newList = (List<?>) value;
-      var another = new ArrayList<>();
-      another.addAll(newList);
-      return another;
-    } catch (Exception e) {
-      return null;
-    }
   }
 }

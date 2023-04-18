@@ -68,7 +68,7 @@ public class StringTypeValidator extends AbstractTypeValidator<String> implement
     validationFunctions.add(
       () -> {
         if (continueValidating)
-          return validateCast();
+          return validateCast(ValidationTypeUtil.getStringCastInfo(valueInfo.getValue()));
         return null;
       }
     );
@@ -118,26 +118,5 @@ public class StringTypeValidator extends AbstractTypeValidator<String> implement
       }
     );
     return this;
-  }
-
-  private String validateCast() {
-    var castedInfo = getCasted(valueInfo.getValue());
-    if (castedInfo.isValid()) {
-      _value = castedInfo.getCasted();
-      return null;
-    }
-    return getMsg("validation.type", getAttr(FIELD_PREFIX + attrName));
-  }
-
-  private CastInfo<String> getCasted(Object value) {
-    var castedInfo = new CastInfo<String>();
-    var strVal = String.valueOf(value);
-    if (strVal.equalsIgnoreCase("null")) {
-      castedInfo.setCasted(null);
-    } else {
-      castedInfo.setCasted(strVal);
-    }
-    castedInfo.setValid(true);
-    return castedInfo;
   }
 }
