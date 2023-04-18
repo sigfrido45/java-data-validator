@@ -9,6 +9,8 @@ import io.sigfrido45.validation.MessageGetter;
 import io.sigfrido45.validation.ValueInfo;
 import lombok.AccessLevel;
 import lombok.Setter;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,6 +47,26 @@ public class NodeValidator {
     return new NodeResponse(validator.validated, validator.errors);
   }
 
+  public static Mono<NodeResponse> validateNodeReactive(List<Node<?>> nodes, Object data, Map<String, Object> additionalContext) {
+    var validator = new NodeValidator();
+    validator.setAdditionalContext(additionalContext);
+    return validator.validateReactive(nodes, data, "")
+      .thenReturn(new NodeResponse(validator.validated, validator.errors));
+  }
+
+  public static Mono<NodeResponse> validateNodeReactive(ParentNode<?> node, Object data, MessageGetter msgGetter) {
+    var validator = new NodeValidator(msgGetter);
+    return validator.validateReactive(node.getChildNodes(), data, node.getAttrName())
+      .thenReturn(new NodeResponse(validator.validated, validator.errors));
+  }
+
+  public static Mono<NodeResponse> validateNodeReactive(List<Node<?>> nodes, Object data, Map<String, Object> additionalContext, MessageGetter msgGetter) {
+    var validator = new NodeValidator(msgGetter);
+    validator.setAdditionalContext(additionalContext);
+    return validator.validateReactive(nodes, data, "")
+      .thenReturn(new NodeResponse(validator.validated, validator.errors));
+  }
+
   private NodeValidator() {
     errors = new ArrayList<>();
     validated = new HashMap<>();
@@ -56,6 +78,45 @@ public class NodeValidator {
     errors = new ArrayList<>();
     validated = new HashMap<>();
     additionalContext = new HashMap<>();
+  }
+
+  private Mono<Void> validateReactive(List<Node<?>> nodes, Object data, String attr) {
+    return Flux.fromIterable(nodes)
+      .flatMap(node -> {
+
+        if (node instanceof ParentNode<?> newParentNode) {
+          var newAttr = (attr.isEmpty() ? attr : attr + ".") + newParentNode.getAttrName();
+          if (data instanceof Map<?, ?> newData) {
+            return validateReactive(
+              newParentNode.getChildNodes(),
+              newData.get(newParentNode.getAttrName()),
+              newAttr
+            );
+          } else {
+            return validateReactive(newParentNode.getChildNodes(), data, newAttr);
+          }
+        }
+
+        if (node instanceof ChildNode<?> childNode) {
+          var nodeValidator = childNode.getTypeValidation();
+          var valueInfo = getValueInfo(data, nodeValidator.getAttrName());
+          nodeValidator.mergeAdditionalContext(additionalContext);
+          nodeValidator.setMsgGetter(msgGetter);
+          nodeValidator.setValueInfo(valueInfo);
+          return nodeValidator.reactiveValidate()
+            .doOnNext((e) -> {
+              if (nodeValidator.isValid()) {
+                if (valueInfo.isPresent()) {
+                  validated.put(nodeValidator.getAttrName(), nodeValidator.validated());
+                }
+              } else {
+                var errorAttr = (attr.isEmpty() ? attr : attr + ".") + childNode.getTypeValidation().getAttrName();
+                errors.add(new Error(errorAttr, node.getTypeValidation().errors().get(0)));
+              }
+            });
+        }
+        return Mono.empty();
+      }).then();
   }
 
   private void validate(List<Node<?>> nodes, Object data, String attr) {

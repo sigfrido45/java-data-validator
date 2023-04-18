@@ -1,11 +1,17 @@
 package io.sigfrido45.validation;
 
+import io.sigfrido45.payload.NodeValidator;
+import io.sigfrido45.tree.ChildNode;
 import io.sigfrido45.tree.Node;
+import io.sigfrido45.tree.ParentNode;
 import io.sigfrido45.validation.actions.IntInterval;
 import io.sigfrido45.validation.actions.Iterable;
 import io.sigfrido45.validation.actions.Presence;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class ListReactiveValidator extends AbstractTypeValidator<List<Object>> implements Presence<List<Object>>, TypeValidator<List<Object>>, Iterable<List<Object>>, IntInterval<List<Object>> {
@@ -66,7 +72,53 @@ public class ListReactiveValidator extends AbstractTypeValidator<List<Object>> i
 
   @Override
   public ListReactiveValidator forEach(Node<?> schemaNode) {
-    //todo
+    reactiveValidationFunctions.add(() -> {
+      if (continueValidating) {
+        return Flux.fromIterable(_value)
+          .index()
+          .flatMap(tuple -> {
+            var i = tuple.getT1().intValue();
+            var additionalContext = new HashMap<String, Object>();
+            additionalContext.put("index", i);
+
+            if (schemaNode instanceof ParentNode<?> parentNode) {
+              return NodeValidator.validateNodeReactive(parentNode.getChildNodes(), tuple.getT2(), additionalContext, getMsgGetter())
+                .map(res -> {
+                  if (res.isValid()) {
+                    if (!res.getValidated().isEmpty()) {
+                      _value.set(i, res.getValidated());
+                    }
+                    return null;
+                  } else {
+                    setAttrName(String.format("%s.%d.%s", attrName, i, res.getErrors().get(0).getKey()));
+                    return res.getErrors().get(0).getMessage();
+                  }
+                });
+            }
+
+            if (schemaNode instanceof ChildNode<?> childNode) {
+              var childNodes = new ArrayList<Node<?>>();
+              childNodes.add(childNode);
+              return NodeValidator.validateNodeReactive(childNodes, tuple.getT2(), additionalContext, getMsgGetter())
+                .map(res -> {
+                  if (res.isValid()) {
+                    if (!res.getValidated().isEmpty()) {
+                      _value.set(i, res.getValidated().values().toArray()[0]);
+                    }
+                    return null;
+                  } else {
+                    setAttrName(String.format("%s.%d", attrName, i));
+                    return res.getErrors().get(0).getMessage();
+                  }
+                });
+            }
+
+            return null;
+          }).next();
+      }
+      return Mono.fromCallable(() -> null);
+    });
+
     return this;
   }
 

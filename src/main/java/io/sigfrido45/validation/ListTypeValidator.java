@@ -83,6 +83,7 @@ public class ListTypeValidator extends AbstractTypeValidator<List<Object>> imple
                 return res.getErrors().get(0).getMessage();
               }
             }
+
           }
         }
         return null;
