@@ -7,6 +7,8 @@ import io.sigfrido45.tree.ParentNode;
 import io.sigfrido45.validation.actions.IntInterval;
 import io.sigfrido45.validation.actions.Iterable;
 import io.sigfrido45.validation.actions.Presence;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -74,15 +76,19 @@ public class ListReactiveValidator extends AbstractTypeValidator<List<Object>> i
   public ListReactiveValidator forEach(Node<?> schemaNode) {
     reactiveValidationFunctions.add(() -> {
       if (continueValidating) {
-        return Flux.fromIterable(_value)
-          .index()
-          .flatMap(tuple -> {
-            var i = tuple.getT1().intValue();
+        var tmpList = new ArrayList<ElemInfo>();
+        for (int i = 0; i < _value.size(); i++) {
+          tmpList.add(new ElemInfo(Integer.valueOf(i), _value.get(i)));
+        }
+
+        return Flux.fromIterable(tmpList)
+          .flatMap(elemInfo -> {
+            var i = elemInfo.getIndex();
             var additionalContext = new HashMap<String, Object>();
             additionalContext.put("index", i);
 
             if (schemaNode instanceof ParentNode<?> parentNode) {
-              return NodeValidator.validateNodeReactive(parentNode.getChildNodes(), tuple.getT2(), additionalContext, getMsgGetter())
+              return NodeValidator.validateNodeReactive(parentNode.getChildNodes(), elemInfo.getValue(), additionalContext, getMsgGetter())
                 .map(res -> {
                   if (res.isValid()) {
                     if (!res.getValidated().isEmpty()) {
@@ -99,7 +105,7 @@ public class ListReactiveValidator extends AbstractTypeValidator<List<Object>> i
             if (schemaNode instanceof ChildNode<?> childNode) {
               var childNodes = new ArrayList<Node<?>>();
               childNodes.add(childNode);
-              return NodeValidator.validateNodeReactive(childNodes, tuple.getT2(), additionalContext, getMsgGetter())
+              return NodeValidator.validateNodeReactive(childNodes, elemInfo.getValue(), additionalContext, getMsgGetter())
                 .map(res -> {
                   if (res.isValid()) {
                     if (!res.getValidated().isEmpty()) {
@@ -113,10 +119,16 @@ public class ListReactiveValidator extends AbstractTypeValidator<List<Object>> i
                 });
             }
 
-            return Mono.error(new RuntimeException("Schema not supported"));
-          }).next();
+            return Mono.just(AbstractTypeValidator.NULL_STR_VALUE);
+          })
+          .collectList()
+          .map(errors -> {
+            return errors.stream().filter(x -> !x.equalsIgnoreCase(AbstractTypeValidator.NULL_STR_VALUE))
+              .findFirst()
+              .orElse(AbstractTypeValidator.NULL_STR_VALUE);
+          });
       }
-      return Mono.fromCallable(() -> null);
+      return Mono.fromCallable(() -> AbstractTypeValidator.NULL_STR_VALUE);
     });
 
     return this;
@@ -132,5 +144,12 @@ public class ListReactiveValidator extends AbstractTypeValidator<List<Object>> i
   public ListReactiveValidator nullable(boolean nullable) {
     reactiveValidationFunctions.add(nullableAsyncValidationFunction(nullable));
     return this;
+  }
+
+  @Data
+  @AllArgsConstructor
+  private static class ElemInfo {
+    private Integer index;
+    private Object value;
   }
 }

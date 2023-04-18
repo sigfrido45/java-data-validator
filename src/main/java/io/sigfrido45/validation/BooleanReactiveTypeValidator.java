@@ -33,7 +33,7 @@ public class BooleanReactiveTypeValidator extends AbstractTypeValidator<Boolean>
 
   @Override
   public BooleanReactiveTypeValidator nullable(boolean nullable) {
-    validationFunctions.add(nullableValidationFunction(nullable));
+    reactiveValidationFunctions.add(nullableAsyncValidationFunction(nullable));
     return this;
   }
 }

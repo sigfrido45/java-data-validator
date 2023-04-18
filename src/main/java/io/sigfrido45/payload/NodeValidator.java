@@ -104,16 +104,18 @@ public class NodeValidator {
           nodeValidator.setMsgGetter(msgGetter);
           nodeValidator.setValueInfo(valueInfo);
           return nodeValidator.reactiveValidate()
-            .doOnNext((e) -> {
-              if (nodeValidator.isValid()) {
-                if (valueInfo.isPresent()) {
-                  validated.put(nodeValidator.getAttrName(), nodeValidator.validated());
+            .then(Mono.fromCallable(() -> {
+                if (nodeValidator.isValid()) {
+                  if (valueInfo.isPresent()) {
+                    validated.put(nodeValidator.getAttrName(), nodeValidator.validated());
+                  }
+                } else {
+                  var errorAttr = (attr.isEmpty() ? attr : attr + ".") + childNode.getTypeValidation().getAttrName();
+                  errors.add(new Error(errorAttr, node.getTypeValidation().errors().get(0)));
                 }
-              } else {
-                var errorAttr = (attr.isEmpty() ? attr : attr + ".") + childNode.getTypeValidation().getAttrName();
-                errors.add(new Error(errorAttr, node.getTypeValidation().errors().get(0)));
-              }
-            });
+                return Mono.empty();
+              })
+            );
         }
         return Mono.empty();
       }).then();

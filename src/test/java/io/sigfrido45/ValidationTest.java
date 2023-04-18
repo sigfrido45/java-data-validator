@@ -8,7 +8,6 @@ import io.sigfrido45.validation.MessageGetter;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -160,18 +159,18 @@ class ValidationTest {
     }};
 
     var schema = ParentNode.build()
-//      .addNode(
-//        ChildNode.<String>build().setValidator(
-//          TypeValidator.strReactive("name").present(true).nullable(false).cast().gte(5)
-//        )
-//      )
-//      .addNode(
-//        ParentNode.build("another").addNode(
-//          ChildNode.<String>build().setValidator(
-//            TypeValidator.strReactive("name2").present(true).nullable(false).cast().gte(1)
-//          )
-//        )
-//      )
+      .addNode(
+        ChildNode.<String>build().setValidator(
+          TypeValidator.strReactive("name").present(true).nullable(false).cast().gte(5)
+        )
+      )
+      .addNode(
+        ParentNode.build("another").addNode(
+          ChildNode.<String>build().setValidator(
+            TypeValidator.strReactive("name2").present(true).nullable(false).cast().gte(1)
+          )
+        )
+      )
       .addNode(
         ChildNode.<List<Object>>build().setValidator(
           TypeValidator.listReactive("numbers").present(true).nullable(false).cast().forEach(
@@ -180,18 +179,18 @@ class ValidationTest {
             )
           )
         )
+      )
+      .addNode(
+        ChildNode.<List<Object>>build().setValidator(
+          TypeValidator.listReactive("persons").present(true).nullable(false).cast().forEach(
+            ParentNode.build().addNode(
+              ChildNode.<String>build().setValidator(
+                TypeValidator.strReactive("name").present(true).nullable(false).cast().gte(1)
+              )
+            )
+          )
+        )
       );
-//      .addNode(
-//        ChildNode.<List<Object>>build().setValidator(
-//          TypeValidator.listReactive("persons").present(true).nullable(false).cast().forEach(
-//            ParentNode.build().addNode(
-//              ChildNode.<String>build().setValidator(
-//                TypeValidator.strReactive("name").present(true).nullable(false).cast().gte(1)
-//              )
-//            )
-//          )
-//        )
-//      );
 
     var res = NodeValidator.validateNodeReactive((ParentNode<?>) schema, payload, new CustomMessageGetter()).block();
     assertFalse(res.isValid());
@@ -252,24 +251,20 @@ class ValidationTest {
           )
         )
       );
-    var response = NodeValidator.validateNodeReactive((ParentNode<?>) schema, payload, new CustomMessageGetter());
-    response.doOnNext(res -> {
-      assertTrue(res.isValid());
-      assertTrue(res.getErrors().isEmpty());
-    }).subscribe();
+    var res = NodeValidator.validateNodeReactive((ParentNode<?>) schema, payload, new CustomMessageGetter()).block();
+    assertTrue(res.isValid());
+    assertTrue(res.getErrors().isEmpty());
   }
 
   public static class CustomMessageGetter implements MessageGetter {
 
     @Override
     public String getMessage(String code, String... args) {
-      System.out.println("get message " + code + " - args " + Arrays.toString(args));
       return "xd";
     }
 
     @Override
     public String getMessage(String code) {
-      System.out.println("get message " + code);
       return "xd";
     }
   }
