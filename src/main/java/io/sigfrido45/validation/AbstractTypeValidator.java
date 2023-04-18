@@ -9,6 +9,7 @@ import java.util.function.Supplier;
 
 public abstract class AbstractTypeValidator<T> {
   public static final String FIELD_PREFIX = "validation.field.";
+  public static final String NULL_STR_VALUE = "null";
   protected ValueInfo valueInfo;
   protected T _value;
   protected List<String> errors;
@@ -67,11 +68,10 @@ public abstract class AbstractTypeValidator<T> {
     return Flux.fromIterable(reactiveValidationFunctions)
       .flatMap(Supplier::get)
       .takeUntil(Objects::nonNull)
+      .filter(str -> !str.equalsIgnoreCase(AbstractTypeValidator.NULL_STR_VALUE))
       .collectList()
-      .flatMap(errs -> {
-        errors.addAll(errs);
-        return Mono.empty();
-      });
+      .map(errs -> errors.addAll(errs))
+      .then();
   }
 
   public boolean isValid() {

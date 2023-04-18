@@ -9,7 +9,7 @@ public class ValidationTypeUtil {
   public static CastInfo<Integer> getIntCastInfo(Object value) {
     var castedInfo = new CastInfo<Integer>();
     var strValue = String.valueOf(value);
-    if (strValue.equalsIgnoreCase("null")) {
+    if (strValue.equalsIgnoreCase(AbstractTypeValidator.NULL_STR_VALUE)) {
       castedInfo.setCasted(null);
       castedInfo.setValid(true);
     } else {
@@ -40,7 +40,7 @@ public class ValidationTypeUtil {
   public static CastInfo<Long> getLongCastInfo(Object value) {
     var castedInfo = new CastInfo<Long>();
     var strValue = String.valueOf(value);
-    if (strValue.equalsIgnoreCase("null")) {
+    if (strValue.equalsIgnoreCase(AbstractTypeValidator.NULL_STR_VALUE)) {
       castedInfo.setCasted(null);
       castedInfo.setValid(true);
     } else {
@@ -57,7 +57,7 @@ public class ValidationTypeUtil {
   public static CastInfo<String> getStringCastInfo(Object value) {
     var castedInfo = new CastInfo<String>();
     var strVal = String.valueOf(value);
-    if (strVal.equalsIgnoreCase("null")) {
+    if (strVal.equalsIgnoreCase(AbstractTypeValidator.NULL_STR_VALUE)) {
       castedInfo.setCasted(null);
     } else {
       castedInfo.setCasted(strVal);
@@ -69,7 +69,7 @@ public class ValidationTypeUtil {
   public static CastInfo<Boolean> getBooleanCastInfo(Object value) {
     var castedInfo = new CastInfo<Boolean>();
     var strVal = String.valueOf(value);
-    if (strVal.equalsIgnoreCase("null")) {
+    if (strVal.equalsIgnoreCase(AbstractTypeValidator.NULL_STR_VALUE)) {
       castedInfo.setValid(false);
     } else {
       try {

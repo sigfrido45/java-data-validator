@@ -138,25 +138,125 @@ class ValidationTest {
   }
 
   @Test
-  public void another() {
+  public void validateReactiveFails() {
     var payload = new HashMap<>() {{
-      put("email", "");
-      put("password", "123");
+      put("name", "1");
+      put("another", new HashMap<>() {{
+        put("name2", "");
+      }});
+      put("numbers", new ArrayList<>() {{
+        add("1");
+        add(2);
+        add(null);
+      }});
+      put("persons", new ArrayList<>() {{
+        add(new HashMap<>() {{
+          put("name", "hole");
+        }});
+        add(new HashMap<>() {{
+          put("name", "");
+        }});
+      }});
+    }};
+
+    var schema = ParentNode.build()
+//      .addNode(
+//        ChildNode.<String>build().setValidator(
+//          TypeValidator.strReactive("name").present(true).nullable(false).cast().gte(5)
+//        )
+//      )
+//      .addNode(
+//        ParentNode.build("another").addNode(
+//          ChildNode.<String>build().setValidator(
+//            TypeValidator.strReactive("name2").present(true).nullable(false).cast().gte(1)
+//          )
+//        )
+//      )
+      .addNode(
+        ChildNode.<List<Object>>build().setValidator(
+          TypeValidator.listReactive("numbers").present(true).nullable(false).cast().forEach(
+            ChildNode.<Integer>build().setValidator(
+              TypeValidator.intReactive().present(true).nullable(false).cast()
+            )
+          )
+        )
+      );
+//      .addNode(
+//        ChildNode.<List<Object>>build().setValidator(
+//          TypeValidator.listReactive("persons").present(true).nullable(false).cast().forEach(
+//            ParentNode.build().addNode(
+//              ChildNode.<String>build().setValidator(
+//                TypeValidator.strReactive("name").present(true).nullable(false).cast().gte(1)
+//              )
+//            )
+//          )
+//        )
+//      );
+
+    var res = NodeValidator.validateNodeReactive((ParentNode<?>) schema, payload, new CustomMessageGetter()).block();
+    assertFalse(res.isValid());
+    assertFalse(res.getErrors().isEmpty());
+  }
+
+  @Test
+  public void validateReactiveOk() {
+    var payload = new HashMap<>() {{
+      put("name", "asdfasdf");
+      put("another", new HashMap<>() {{
+        put("name2", "asdfasd");
+      }});
+      put("numbers", new ArrayList<>() {{
+        add("1");
+        add(2);
+        add(3);
+      }});
+      put("persons", new ArrayList<>() {{
+        add(new HashMap<>() {{
+          put("name", "hole");
+        }});
+        add(new HashMap<>() {{
+          put("name", "asdfasdf");
+        }});
+      }});
     }};
     var schema = ParentNode.build()
       .addNode(
         ChildNode.<String>build().setValidator(
-          TypeValidator.str("email").present(true).nullable(false).cast().lt(100).gte(0)
+          TypeValidator.strReactive("name").present(true).nullable(false).cast().gte(5)
         )
       )
       .addNode(
-        ChildNode.<String>build().setValidator(
-          TypeValidator.str("password").present(true).nullable(false).cast().lt(100).gt(0)
+        ParentNode.build("another").addNode(
+          ChildNode.<String>build().setValidator(
+            TypeValidator.strReactive("name2").present(true).nullable(false).cast().gte(1)
+          )
+        )
+      )
+      .addNode(
+        ChildNode.<List<Object>>build().setValidator(
+          TypeValidator.listReactive("numbers").present(true).nullable(false).cast().forEach(
+            ChildNode.<Integer>build().setValidator(
+              TypeValidator.intReactive().present(true).nullable(false).cast()
+            )
+          )
+        )
+      )
+      .addNode(
+        ChildNode.<List<Object>>build().setValidator(
+          TypeValidator.listReactive("persons").present(true).nullable(false).cast().forEach(
+            ParentNode.build().addNode(
+              ChildNode.<String>build().setValidator(
+                TypeValidator.strReactive("name").present(true).nullable(false).cast().gte(1)
+              )
+            )
+          )
         )
       );
-
-    var response = NodeValidator.validateNode((ParentNode<?>) schema, payload, new CustomMessageGetter());
-    assertFalse(response.isValid());
+    var response = NodeValidator.validateNodeReactive((ParentNode<?>) schema, payload, new CustomMessageGetter());
+    response.doOnNext(res -> {
+      assertTrue(res.isValid());
+      assertTrue(res.getErrors().isEmpty());
+    }).subscribe();
   }
 
   public static class CustomMessageGetter implements MessageGetter {

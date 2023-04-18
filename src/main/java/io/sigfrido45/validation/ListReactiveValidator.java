@@ -88,7 +88,7 @@ public class ListReactiveValidator extends AbstractTypeValidator<List<Object>> i
                     if (!res.getValidated().isEmpty()) {
                       _value.set(i, res.getValidated());
                     }
-                    return null;
+                    return AbstractTypeValidator.NULL_STR_VALUE;
                   } else {
                     setAttrName(String.format("%s.%d.%s", attrName, i, res.getErrors().get(0).getKey()));
                     return res.getErrors().get(0).getMessage();
@@ -105,7 +105,7 @@ public class ListReactiveValidator extends AbstractTypeValidator<List<Object>> i
                     if (!res.getValidated().isEmpty()) {
                       _value.set(i, res.getValidated().values().toArray()[0]);
                     }
-                    return null;
+                    return AbstractTypeValidator.NULL_STR_VALUE;
                   } else {
                     setAttrName(String.format("%s.%d", attrName, i));
                     return res.getErrors().get(0).getMessage();
@@ -113,7 +113,7 @@ public class ListReactiveValidator extends AbstractTypeValidator<List<Object>> i
                 });
             }
 
-            return null;
+            return Mono.error(new RuntimeException("Schema not supported"));
           }).next();
       }
       return Mono.fromCallable(() -> null);
