@@ -20,7 +20,7 @@ public class ListReactiveValidator extends AbstractTypeValidator<List<Object>> i
 
   @Override
   public ListReactiveValidator cast() {
-    asyncValidationFunctions.add(() ->
+    reactiveValidationFunctions.add(() ->
       Mono.fromCallable(() -> {
         if (continueValidating)
           return validateCast(ValidationTypeUtil.getListCastInfo(valueInfo.getValue()));
@@ -32,7 +32,7 @@ public class ListReactiveValidator extends AbstractTypeValidator<List<Object>> i
 
   @Override
   public ListReactiveValidator gte(int min) {
-    asyncValidationFunctions.add(() ->
+    reactiveValidationFunctions.add(() ->
       Mono.fromCallable(() -> {
         if (continueValidating && _value.size() <= min)
           return getMsg("validation.list.min", getAttr(FIELD_PREFIX + attrName), String.valueOf(min));
@@ -44,7 +44,7 @@ public class ListReactiveValidator extends AbstractTypeValidator<List<Object>> i
 
   @Override
   public ListReactiveValidator lte(int max) {
-    asyncValidationFunctions.add(() ->
+    reactiveValidationFunctions.add(() ->
       Mono.fromCallable(() -> {
         if (continueValidating && _value.size() >= max)
           return getMsg("validation.list.max", getAttr(FIELD_PREFIX + attrName), String.valueOf(max));
@@ -72,13 +72,13 @@ public class ListReactiveValidator extends AbstractTypeValidator<List<Object>> i
 
   @Override
   public ListReactiveValidator present(boolean present) {
-    asyncValidationFunctions.add(presentAsyncValidationFunction(present));
+    reactiveValidationFunctions.add(presentAsyncValidationFunction(present));
     return this;
   }
 
   @Override
   public ListReactiveValidator nullable(boolean nullable) {
-    asyncValidationFunctions.add(nullableAsyncValidationFunction(nullable));
+    reactiveValidationFunctions.add(nullableAsyncValidationFunction(nullable));
     return this;
   }
 }

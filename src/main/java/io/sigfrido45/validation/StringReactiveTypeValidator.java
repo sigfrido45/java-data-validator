@@ -21,7 +21,7 @@ public class StringReactiveTypeValidator extends AbstractTypeValidator<String> i
 
   @Override
   public StringReactiveTypeValidator cast() {
-    asyncValidationFunctions.add(() ->
+    reactiveValidationFunctions.add(() ->
       Mono.fromCallable(() -> {
         if (continueValidating)
           return validateCast(ValidationTypeUtil.getStringCastInfo(valueInfo.getValue()));
@@ -33,7 +33,7 @@ public class StringReactiveTypeValidator extends AbstractTypeValidator<String> i
 
   @Override
   public StringReactiveTypeValidator gte(int min) {
-    asyncValidationFunctions.add(() ->
+    reactiveValidationFunctions.add(() ->
       Mono.fromCallable(() -> {
         if (continueValidating && _value.length() <= min)
           return getMsg("validation.string.min", getAttr(FIELD_PREFIX + attrName), String.valueOf(min));
@@ -45,7 +45,7 @@ public class StringReactiveTypeValidator extends AbstractTypeValidator<String> i
 
   @Override
   public StringReactiveTypeValidator lte(int max) {
-    asyncValidationFunctions.add(() ->
+    reactiveValidationFunctions.add(() ->
       Mono.fromCallable(() -> {
         if (continueValidating && _value.length() >= max)
           return getMsg("validation.string.max", getAttr(FIELD_PREFIX + attrName), String.valueOf(max));
@@ -67,18 +67,18 @@ public class StringReactiveTypeValidator extends AbstractTypeValidator<String> i
 
   @Override
   public StringReactiveTypeValidator present(boolean present) {
-    asyncValidationFunctions.add(presentAsyncValidationFunction(present));
+    reactiveValidationFunctions.add(presentAsyncValidationFunction(present));
     return this;
   }
 
   @Override
   public StringReactiveTypeValidator nullable(boolean nullable) {
-    asyncValidationFunctions.add(nullableAsyncValidationFunction(nullable));
+    reactiveValidationFunctions.add(nullableAsyncValidationFunction(nullable));
     return this;
   }
 
   public StringReactiveTypeValidator regex(Pattern pattern) {
-    asyncValidationFunctions.add(() ->
+    reactiveValidationFunctions.add(() ->
       Mono.fromCallable(() -> {
         if (continueValidating && !pattern.matcher(_value).matches())
           return getMsg("validation.string.regex", getAttr(FIELD_PREFIX + attrName));
@@ -89,7 +89,7 @@ public class StringReactiveTypeValidator extends AbstractTypeValidator<String> i
   }
 
   public StringReactiveTypeValidator notEmpty() {
-    asyncValidationFunctions.add(() ->
+    reactiveValidationFunctions.add(() ->
       Mono.fromCallable(() -> {
         if (continueValidating && _value.trim().isEmpty())
           return getMsg("validation.string.empty", getAttr(FIELD_PREFIX + attrName));
@@ -108,7 +108,7 @@ public class StringReactiveTypeValidator extends AbstractTypeValidator<String> i
   }
 
   public StringReactiveTypeValidator in(List<String> args) {
-    asyncValidationFunctions.add(() ->
+    reactiveValidationFunctions.add(() ->
       Mono.fromCallable(() -> {
         if (continueValidating) {
           var find = args.stream().filter(a -> a.equalsIgnoreCase(_value)).findFirst().orElse(null);

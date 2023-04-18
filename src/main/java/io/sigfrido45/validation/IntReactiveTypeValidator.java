@@ -16,7 +16,7 @@ public class IntReactiveTypeValidator extends AbstractTypeValidator<Integer> imp
 
   @Override
   public IntReactiveTypeValidator cast() {
-    asyncValidationFunctions.add(() ->
+    reactiveValidationFunctions.add(() ->
       Mono.fromCallable(() -> {
         if (continueValidating)
           return validateCast(ValidationTypeUtil.getIntCastInfo(valueInfo.getValue()));
@@ -28,7 +28,7 @@ public class IntReactiveTypeValidator extends AbstractTypeValidator<Integer> imp
 
   @Override
   public IntReactiveTypeValidator gte(int min) {
-    asyncValidationFunctions.add(() ->
+    reactiveValidationFunctions.add(() ->
       Mono.fromCallable(() -> {
         if (continueValidating && _value <= min)
           return getMsg("validation.string.min", getAttr(FIELD_PREFIX + attrName), String.valueOf(min));
@@ -40,7 +40,7 @@ public class IntReactiveTypeValidator extends AbstractTypeValidator<Integer> imp
 
   @Override
   public IntReactiveTypeValidator lte(int max) {
-    asyncValidationFunctions.add(() ->
+    reactiveValidationFunctions.add(() ->
       Mono.fromCallable(() -> {
         if (continueValidating && _value >= max)
           return getMsg("validation.string.max", getAttr(FIELD_PREFIX + attrName), String.valueOf(max));
@@ -62,7 +62,7 @@ public class IntReactiveTypeValidator extends AbstractTypeValidator<Integer> imp
 
   @Override
   public IntReactiveTypeValidator present(boolean present) {
-    asyncValidationFunctions.add(presentAsyncValidationFunction(present));
+    reactiveValidationFunctions.add(presentAsyncValidationFunction(present));
     return this;
   }
 

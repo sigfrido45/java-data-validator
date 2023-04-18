@@ -15,7 +15,7 @@ public abstract class AbstractTypeValidator<T> {
   protected boolean continueValidating;
   protected String attrName;
   protected List<Supplier<String>> validationFunctions;
-  protected List<Supplier<Mono<String>>> asyncValidationFunctions;
+  protected List<Supplier<Mono<String>>> reactiveValidationFunctions;
   private Map<String, Object> context;
   private MessageGetter msgGetter;
 
@@ -25,7 +25,7 @@ public abstract class AbstractTypeValidator<T> {
     errors = new ArrayList<>();
     continueValidating = true;
     validationFunctions = new ArrayList<>();
-    asyncValidationFunctions = new ArrayList<>();
+    reactiveValidationFunctions = new ArrayList<>();
   }
 
   public AbstractTypeValidator() {
@@ -34,7 +34,7 @@ public abstract class AbstractTypeValidator<T> {
     errors = new ArrayList<>();
     continueValidating = true;
     validationFunctions = new ArrayList<>();
-    asyncValidationFunctions = new ArrayList<>();
+    reactiveValidationFunctions = new ArrayList<>();
   }
 
   public String getAttrName() {
@@ -63,8 +63,8 @@ public abstract class AbstractTypeValidator<T> {
     }
   }
 
-  public Mono<Void> validateAsync() {
-    return Flux.fromIterable(asyncValidationFunctions)
+  public Mono<Void> reactiveValidate() {
+    return Flux.fromIterable(reactiveValidationFunctions)
       .flatMap(Supplier::get)
       .takeUntil(Objects::nonNull)
       .collectList()
@@ -99,7 +99,7 @@ public abstract class AbstractTypeValidator<T> {
   }
 
   public AbstractTypeValidator<T> customAsync(Function<Map<String, Object>, Mono<String>> function) {
-    asyncValidationFunctions.add(
+    reactiveValidationFunctions.add(
       () -> {
         if (continueValidating) {
           return function.apply(context);

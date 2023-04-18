@@ -16,7 +16,7 @@ public class LongReactiveValidator extends AbstractTypeValidator<Long> implement
 
   @Override
   public LongReactiveValidator cast() {
-    asyncValidationFunctions.add(() ->
+    reactiveValidationFunctions.add(() ->
       Mono.fromCallable(() -> {
         if (continueValidating)
           return validateCast(ValidationTypeUtil.getLongCastInfo(valueInfo.getValue()));
@@ -28,7 +28,7 @@ public class LongReactiveValidator extends AbstractTypeValidator<Long> implement
 
   @Override
   public LongReactiveValidator gte(Long min) {
-    asyncValidationFunctions.add(() ->
+    reactiveValidationFunctions.add(() ->
       Mono.fromCallable(() -> {
         if (continueValidating && _value <= min)
           return getMsg("validation.number.min", getAttr(FIELD_PREFIX + attrName), String.valueOf(min));
@@ -40,7 +40,7 @@ public class LongReactiveValidator extends AbstractTypeValidator<Long> implement
 
   @Override
   public LongReactiveValidator lte(Long max) {
-    asyncValidationFunctions.add(() ->
+    reactiveValidationFunctions.add(() ->
       Mono.fromCallable(() -> {
         if (continueValidating && _value >= max)
           return getMsg("validation.number.max", getAttr(FIELD_PREFIX + attrName), String.valueOf(max));
@@ -62,13 +62,13 @@ public class LongReactiveValidator extends AbstractTypeValidator<Long> implement
 
   @Override
   public LongReactiveValidator present(boolean present) {
-    asyncValidationFunctions.add(presentAsyncValidationFunction(present));
+    reactiveValidationFunctions.add(presentAsyncValidationFunction(present));
     return this;
   }
 
   @Override
   public LongReactiveValidator nullable(boolean nullable) {
-    asyncValidationFunctions.add(nullableAsyncValidationFunction(nullable));
+    reactiveValidationFunctions.add(nullableAsyncValidationFunction(nullable));
     return this;
   }
 }

@@ -65,4 +65,20 @@ public class ValidationTypeUtil {
     castedInfo.setValid(true);
     return castedInfo;
   }
+
+  public static CastInfo<Boolean> getBooleanCastInfo(Object value) {
+    var castedInfo = new CastInfo<Boolean>();
+    var strVal = String.valueOf(value);
+    if (strVal.equalsIgnoreCase("null")) {
+      castedInfo.setValid(false);
+    } else {
+      try {
+        castedInfo.setCasted(Boolean.valueOf(strVal));
+        castedInfo.setValid(true);
+      } catch (Exception e) {
+        castedInfo.setValid(false);
+      }
+    }
+    return castedInfo;
+  }
 }
