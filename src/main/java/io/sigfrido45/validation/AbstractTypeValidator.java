@@ -104,7 +104,7 @@ public abstract class AbstractTypeValidator<T> {
         if (continueValidating) {
           return function.apply(context);
         }
-        return null;
+        return Mono.just(AbstractTypeValidator.NULL_STR_VALUE);
       }
     );
     return this;
