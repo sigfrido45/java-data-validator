@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class ValidationTypeUtil {
 
 
@@ -101,7 +102,8 @@ public class ValidationTypeUtil {
           castedInfo.setCasted(BigDecimal.valueOf(intValue));
           castedInfo.setValid(true);
         } else {
-          throw new RuntimeException();
+          castedInfo.setCasted(BigDecimal.valueOf(Double.parseDouble(strValue)));
+          castedInfo.setValid(true);
         }
       } catch (Exception e) {
         castedInfo.setValid(false);
