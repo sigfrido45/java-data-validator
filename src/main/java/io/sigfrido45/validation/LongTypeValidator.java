@@ -51,7 +51,7 @@ public class LongTypeValidator extends AbstractTypeValidator<Long> implements Pr
 
   @Override
   public LongTypeValidator gt(Long min) {
-    return gte(min - 1);
+    return gte(min + 1);
   }
 
   @Override

@@ -1,36 +1,39 @@
 package io.sigfrido45.validation;
 
-import io.sigfrido45.validation.actions.LongInterval;
+import io.sigfrido45.validation.actions.DecimalInterval;
 import io.sigfrido45.validation.actions.Presence;
 import reactor.core.publisher.Mono;
 
-public class LongReactiveValidator extends AbstractTypeValidator<Long> implements Presence<Long>, LongInterval<Long>, TypeValidator<Long> {
+import java.math.BigDecimal;
 
-  public LongReactiveValidator(String attrName) {
+public class BigDecimalReactiveTypeValidator extends AbstractTypeValidator<BigDecimal> implements Presence<BigDecimal>, DecimalInterval<BigDecimal>, TypeValidator<BigDecimal> {
+
+  public BigDecimalReactiveTypeValidator(String attrName) {
     super(attrName);
   }
 
-  public LongReactiveValidator() {
+  public BigDecimalReactiveTypeValidator() {
     super();
   }
 
   @Override
-  public LongReactiveValidator cast() {
+  public BigDecimalReactiveTypeValidator cast() {
     reactiveValidationFunctions.add(() ->
       Mono.fromCallable(() -> {
         if (continueValidating)
-          return validateCast(ValidationTypeUtil.getLongCastInfo(valueInfo.getValue()));
+          return validateCast(ValidationTypeUtil.getBigDecimalCastInfo(valueInfo.getValue()));
         return null;
       })
+
     );
     return this;
   }
 
   @Override
-  public LongReactiveValidator gte(Long min) {
+  public BigDecimalReactiveTypeValidator gte(double min) {
     reactiveValidationFunctions.add(() ->
       Mono.fromCallable(() -> {
-        if (continueValidating && _value <= min)
+        if (continueValidating && _value.compareTo(BigDecimal.valueOf(min)) <= 0)
           return getMsg("validation.number.min", getAttr(FIELD_PREFIX + attrName), String.valueOf(min));
         return null;
       })
@@ -39,10 +42,10 @@ public class LongReactiveValidator extends AbstractTypeValidator<Long> implement
   }
 
   @Override
-  public LongReactiveValidator lte(Long max) {
+  public BigDecimalReactiveTypeValidator lte(double max) {
     reactiveValidationFunctions.add(() ->
       Mono.fromCallable(() -> {
-        if (continueValidating && _value >= max)
+        if (continueValidating && _value.compareTo(BigDecimal.valueOf(max)) >= 0)
           return getMsg("validation.number.max", getAttr(FIELD_PREFIX + attrName), String.valueOf(max));
         return null;
       })
@@ -51,23 +54,23 @@ public class LongReactiveValidator extends AbstractTypeValidator<Long> implement
   }
 
   @Override
-  public LongReactiveValidator gt(Long min) {
-    return gte(min + 1);
+  public BigDecimalReactiveTypeValidator lt(double min) {
+    return lte(min - 1);
   }
 
   @Override
-  public LongReactiveValidator lt(Long max) {
-    return lte(max - 1);
+  public BigDecimalReactiveTypeValidator gt(double max) {
+    return gte(max + 1);
   }
 
   @Override
-  public LongReactiveValidator present(boolean present) {
+  public BigDecimalReactiveTypeValidator present(boolean present) {
     reactiveValidationFunctions.add(presentAsyncValidationFunction(present));
     return this;
   }
 
   @Override
-  public LongReactiveValidator nullable(boolean nullable) {
+  public BigDecimalReactiveTypeValidator nullable(boolean nullable) {
     reactiveValidationFunctions.add(nullableAsyncValidationFunction(nullable));
     return this;
   }
