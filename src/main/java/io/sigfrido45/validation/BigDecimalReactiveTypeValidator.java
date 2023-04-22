@@ -33,7 +33,7 @@ public class BigDecimalReactiveTypeValidator extends AbstractTypeValidator<BigDe
   public BigDecimalReactiveTypeValidator gte(double min) {
     reactiveValidationFunctions.add(() ->
       Mono.fromCallable(() -> {
-        if (continueValidating && _value.compareTo(BigDecimal.valueOf(min)) <= 0)
+        if (continueValidating && _value.compareTo(BigDecimal.valueOf(min)) < 0)
           return getMsg("validation.number.min", getAttr(FIELD_PREFIX + attrName), String.valueOf(min));
         return null;
       })
@@ -45,7 +45,7 @@ public class BigDecimalReactiveTypeValidator extends AbstractTypeValidator<BigDe
   public BigDecimalReactiveTypeValidator lte(double max) {
     reactiveValidationFunctions.add(() ->
       Mono.fromCallable(() -> {
-        if (continueValidating && _value.compareTo(BigDecimal.valueOf(max)) >= 0)
+        if (continueValidating && _value.compareTo(BigDecimal.valueOf(max)) > 0)
           return getMsg("validation.number.max", getAttr(FIELD_PREFIX + attrName), String.valueOf(max));
         return null;
       })
