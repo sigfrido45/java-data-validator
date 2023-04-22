@@ -29,7 +29,7 @@ public class LongTypeValidator extends AbstractTypeValidator<Long> implements Pr
   public LongTypeValidator gte(Long min) {
     validationFunctions.add(
       () -> {
-        if (continueValidating && _value <= min)
+        if (continueValidating && _value < min)
           return getMsg("validation.number.min", getAttr(FIELD_PREFIX + attrName), String.valueOf(min));
         return null;
       }
@@ -41,7 +41,7 @@ public class LongTypeValidator extends AbstractTypeValidator<Long> implements Pr
   public LongTypeValidator lte(Long max) {
     validationFunctions.add(
       () -> {
-        if (continueValidating && _value >= max)
+        if (continueValidating && _value > max)
           return getMsg("validation.number.max", getAttr(FIELD_PREFIX + attrName), String.valueOf(max));
         return null;
       }

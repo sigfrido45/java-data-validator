@@ -35,7 +35,7 @@ public class StringReactiveTypeValidator extends AbstractTypeValidator<String> i
   public StringReactiveTypeValidator gte(int min) {
     reactiveValidationFunctions.add(() ->
       Mono.fromCallable(() -> {
-        if (continueValidating && _value.length() <= min)
+        if (continueValidating && _value.length() < min)
           return getMsg("validation.string.min", getAttr(FIELD_PREFIX + attrName), String.valueOf(min));
         return null;
       })
@@ -47,7 +47,7 @@ public class StringReactiveTypeValidator extends AbstractTypeValidator<String> i
   public StringReactiveTypeValidator lte(int max) {
     reactiveValidationFunctions.add(() ->
       Mono.fromCallable(() -> {
-        if (continueValidating && _value.length() >= max)
+        if (continueValidating && _value.length() > max)
           return getMsg("validation.string.max", getAttr(FIELD_PREFIX + attrName), String.valueOf(max));
         return null;
       })

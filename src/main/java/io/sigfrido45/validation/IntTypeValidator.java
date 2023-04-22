@@ -29,7 +29,7 @@ public class IntTypeValidator extends AbstractTypeValidator<Integer> implements 
   public IntTypeValidator gte(int min) {
     validationFunctions.add(
       () -> {
-        if (continueValidating && _value <= min)
+        if (continueValidating && _value < min)
           return getMsg("validation.string.min", getAttr(FIELD_PREFIX + attrName), String.valueOf(min));
         return null;
       }
@@ -41,7 +41,7 @@ public class IntTypeValidator extends AbstractTypeValidator<Integer> implements 
   public IntTypeValidator lte(int max) {
     validationFunctions.add(
       () -> {
-        if (continueValidating && _value >= max)
+        if (continueValidating && _value > max)
           return getMsg("validation.string.max", getAttr(FIELD_PREFIX + attrName), String.valueOf(max));
         return null;
       }

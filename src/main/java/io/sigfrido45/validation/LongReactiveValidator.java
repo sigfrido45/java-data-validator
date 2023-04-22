@@ -30,7 +30,7 @@ public class LongReactiveValidator extends AbstractTypeValidator<Long> implement
   public LongReactiveValidator gte(Long min) {
     reactiveValidationFunctions.add(() ->
       Mono.fromCallable(() -> {
-        if (continueValidating && _value <= min)
+        if (continueValidating && _value < min)
           return getMsg("validation.number.min", getAttr(FIELD_PREFIX + attrName), String.valueOf(min));
         return null;
       })
@@ -42,7 +42,7 @@ public class LongReactiveValidator extends AbstractTypeValidator<Long> implement
   public LongReactiveValidator lte(Long max) {
     reactiveValidationFunctions.add(() ->
       Mono.fromCallable(() -> {
-        if (continueValidating && _value >= max)
+        if (continueValidating && _value > max)
           return getMsg("validation.number.max", getAttr(FIELD_PREFIX + attrName), String.valueOf(max));
         return null;
       })

@@ -32,7 +32,7 @@ public class BigDecimalTypeValidator extends AbstractTypeValidator<BigDecimal> i
   public BigDecimalTypeValidator gte(double min) {
     validationFunctions.add(
       () -> {
-        if (continueValidating && _value.compareTo(BigDecimal.valueOf(min)) <= 0)
+        if (continueValidating && _value.compareTo(BigDecimal.valueOf(min)) < 0)
           return getMsg("validation.number.min", getAttr(FIELD_PREFIX + attrName), String.valueOf(min));
         return null;
       }
@@ -43,7 +43,7 @@ public class BigDecimalTypeValidator extends AbstractTypeValidator<BigDecimal> i
   @Override
   public BigDecimalTypeValidator lte(double max) {
     validationFunctions.add(() -> {
-      if (continueValidating && _value.compareTo(BigDecimal.valueOf(max)) >= 0)
+      if (continueValidating && _value.compareTo(BigDecimal.valueOf(max)) > 0)
         return getMsg("validation.number.max", getAttr(FIELD_PREFIX + attrName), String.valueOf(max));
       return null;
     });
