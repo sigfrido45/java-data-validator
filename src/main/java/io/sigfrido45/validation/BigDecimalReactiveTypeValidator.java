@@ -74,4 +74,15 @@ public class BigDecimalReactiveTypeValidator extends AbstractTypeValidator<BigDe
     reactiveValidationFunctions.add(nullableAsyncValidationFunction(nullable));
     return this;
   }
+
+  public BigDecimalReactiveTypeValidator decimalsCount(int decimals) {
+    reactiveValidationFunctions.add(() ->
+      Mono.fromCallable(() -> {
+        if (continueValidating && _value.scale() > decimals)
+          return getMsg("validation.number.decimals-count", getAttr(FIELD_PREFIX + attrName), String.valueOf(decimals));
+        return null;
+      })
+    );
+    return this;
+  }
 }
