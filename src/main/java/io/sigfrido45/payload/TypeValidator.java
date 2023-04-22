@@ -86,4 +86,20 @@ public class TypeValidator {
   public static BooleanReactiveTypeValidator boolReactive() {
     return new BooleanReactiveTypeValidator();
   }
+
+  public static BigDecimalReactiveTypeValidator bigDecimalReactive(String attrName) {
+    return new BigDecimalReactiveTypeValidator(attrName);
+  }
+
+  public static BigDecimalReactiveTypeValidator bigDecimalReactive() {
+    return new BigDecimalReactiveTypeValidator();
+  }
+
+  public static BigDecimalTypeValidator bigDecimal(String attrName) {
+    return new BigDecimalTypeValidator(attrName);
+  }
+
+  public static BigDecimalTypeValidator bigDecimal() {
+    return new BigDecimalTypeValidator();
+  }
 }
