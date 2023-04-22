@@ -71,7 +71,7 @@ public class ValidationTypeUtil {
   public static CastInfo<Boolean> getBooleanCastInfo(Object value) {
     var castedInfo = new CastInfo<Boolean>();
     var strVal = String.valueOf(value);
-    if (strVal.equalsIgnoreCase(AbstractTypeValidator.NULL_STR_VALUE)) {
+    if (strVal.equalsIgnoreCase(AbstractTypeValidator.NULL_STR_VALUE) || strVal.trim().isEmpty()) {
       castedInfo.setValid(false);
     } else {
       try {
