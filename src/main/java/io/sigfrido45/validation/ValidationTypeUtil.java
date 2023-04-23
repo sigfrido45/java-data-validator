@@ -74,10 +74,13 @@ public class ValidationTypeUtil {
     if (strVal.equalsIgnoreCase(AbstractTypeValidator.NULL_STR_VALUE) || strVal.trim().isEmpty()) {
       castedInfo.setValid(false);
     } else {
-      try {
-        castedInfo.setCasted(Boolean.valueOf(strVal));
+      if (strVal.equalsIgnoreCase("true") || strVal.equalsIgnoreCase("1")) {
+        castedInfo.setCasted(Boolean.TRUE);
         castedInfo.setValid(true);
-      } catch (Exception e) {
+      } else if (strVal.equalsIgnoreCase("false") || strVal.equalsIgnoreCase("0")) {
+        castedInfo.setCasted(Boolean.FALSE);
+        castedInfo.setValid(true);
+      } else {
         castedInfo.setValid(false);
       }
     }
