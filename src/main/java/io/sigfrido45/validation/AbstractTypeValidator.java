@@ -150,9 +150,9 @@ public abstract class AbstractTypeValidator<T> {
 
   protected Supplier<String> nullableValidationFunction(boolean wantNull) {
     return () -> {
-      if (continueValidating && wantNull && Objects.isNull(valueInfo.getValue())) {
+      if (continueValidating && wantNull && isNull(valueInfo.getValue())) {
         continueValidating = false;
-      } else if (continueValidating && !wantNull && Objects.isNull(valueInfo.getValue())) {
+      } else if (continueValidating && !wantNull && isNull(valueInfo.getValue())) {
         return getMsg("validation.nullable", getAttr(FIELD_PREFIX + attrName));
       }
       return null;
@@ -161,9 +161,9 @@ public abstract class AbstractTypeValidator<T> {
 
   protected Supplier<Mono<String>> nullableAsyncValidationFunction(boolean wantNull) {
     return () -> Mono.fromCallable(() -> {
-      if (continueValidating && wantNull && Objects.isNull(valueInfo.getValue())) {
+      if (continueValidating && wantNull && isNull(valueInfo.getValue())) {
         continueValidating = false;
-      } else if (continueValidating && !wantNull && Objects.isNull(valueInfo.getValue())) {
+      } else if (continueValidating && !wantNull && isNull(valueInfo.getValue())) {
         return getMsg("validation.nullable", getAttr(FIELD_PREFIX + attrName));
       }
       return null;
@@ -177,6 +177,11 @@ public abstract class AbstractTypeValidator<T> {
       return null;
     }
     return getMsg("validation.type", getAttr(FIELD_PREFIX + attrName));
+  }
+
+  protected boolean isNull(Object value) {
+    var strVal = String.valueOf(value);
+    return strVal.equalsIgnoreCase(NULL_STR_VALUE);
   }
 
   private void initContext() {

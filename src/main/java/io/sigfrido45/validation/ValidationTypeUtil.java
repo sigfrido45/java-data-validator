@@ -7,7 +7,6 @@ import java.util.List;
 
 public class ValidationTypeUtil {
 
-
   public static CastInfo<Integer> getIntCastInfo(Object value) {
     var castedInfo = new CastInfo<Integer>();
     var strValue = String.valueOf(value);
