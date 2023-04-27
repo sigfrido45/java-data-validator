@@ -96,7 +96,7 @@ public class ListTypeValidator extends AbstractTypeValidator<List<Object>> imple
   public ListTypeValidator gte(int min) {
     validationFunctions.add(
       () -> {
-        if (continueValidating && _value.size() <= min)
+        if (continueValidating && _value.size() < min)
           return getMsg("validation.list.min", getAttr(FIELD_PREFIX + attrName), String.valueOf(min));
         return null;
       }
@@ -108,7 +108,7 @@ public class ListTypeValidator extends AbstractTypeValidator<List<Object>> imple
   public ListTypeValidator lte(int max) {
     validationFunctions.add(
       () -> {
-        if (continueValidating && _value.size() >= max)
+        if (continueValidating && _value.size() > max)
           return getMsg("validation.list.max", getAttr(FIELD_PREFIX + attrName), String.valueOf(max));
         return null;
       }

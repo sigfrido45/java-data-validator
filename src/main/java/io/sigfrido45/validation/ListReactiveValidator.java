@@ -42,7 +42,7 @@ public class ListReactiveValidator extends AbstractTypeValidator<List<Object>> i
   public ListReactiveValidator gte(int min) {
     reactiveValidationFunctions.add(() ->
       Mono.fromCallable(() -> {
-        if (continueValidating && _value.size() <= min)
+        if (continueValidating && _value.size() < min)
           return getMsg("validation.list.min", getAttr(FIELD_PREFIX + attrName), String.valueOf(min));
         return null;
       })
@@ -54,7 +54,7 @@ public class ListReactiveValidator extends AbstractTypeValidator<List<Object>> i
   public ListReactiveValidator lte(int max) {
     reactiveValidationFunctions.add(() ->
       Mono.fromCallable(() -> {
-        if (continueValidating && _value.size() >= max)
+        if (continueValidating && _value.size() > max)
           return getMsg("validation.list.max", getAttr(FIELD_PREFIX + attrName), String.valueOf(max));
         return null;
       })
