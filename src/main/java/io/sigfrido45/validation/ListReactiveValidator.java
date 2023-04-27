@@ -79,7 +79,7 @@ public class ListReactiveValidator extends AbstractTypeValidator<List<Object>> i
         var tmpList = new ArrayList<ElemInfo>();
 
         for (int i = 0; i < _value.size(); i++) {
-          tmpList.add(new ElemInfo(i, _value.get(i)));
+          tmpList.add(new ElemInfo(i, _value.get(i), attrName));
         }
 
         return Flux.fromIterable(tmpList)
@@ -98,7 +98,7 @@ public class ListReactiveValidator extends AbstractTypeValidator<List<Object>> i
                     }
                     return AbstractTypeValidator.NULL_STR_VALUE;
                   } else {
-                    setAttrName(String.format("%s.%d.%s", attrName, i, res.getErrors().get(0).getKey()));
+                    setAttrName(String.format("%s.%d.%s", elemInfo.getAttrName(), i, res.getErrors().get(0).getKey()));
                     return res.getErrors().get(0).getMessage();
                   }
                 });
@@ -115,7 +115,7 @@ public class ListReactiveValidator extends AbstractTypeValidator<List<Object>> i
                     }
                     return AbstractTypeValidator.NULL_STR_VALUE;
                   } else {
-                    setAttrName(String.format("%s.%d", attrName, i));
+                    setAttrName(String.format("%s.%d", elemInfo.getAttrName(), i));
                     return res.getErrors().get(0).getMessage();
                   }
                 });
@@ -152,5 +152,6 @@ public class ListReactiveValidator extends AbstractTypeValidator<List<Object>> i
   private static class ElemInfo {
     private int index;
     private Object value;
+    private String attrName;
   }
 }
