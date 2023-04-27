@@ -123,11 +123,7 @@ public class ListReactiveValidator extends AbstractTypeValidator<List<Object>> i
 
             return Mono.just(AbstractTypeValidator.NULL_STR_VALUE);
           })
-          .collectList()
-          .map(errors -> errors.stream().filter(x -> !x.equalsIgnoreCase(AbstractTypeValidator.NULL_STR_VALUE))
-            .findFirst()
-            .orElse(AbstractTypeValidator.NULL_STR_VALUE)
-          );
+          .next();
       }
       return Mono.fromCallable(() -> AbstractTypeValidator.NULL_STR_VALUE);
     });
