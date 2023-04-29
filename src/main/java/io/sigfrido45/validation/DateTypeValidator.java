@@ -51,7 +51,7 @@ public class DateTypeValidator extends AbstractTypeValidator<LocalDate> implemen
   public DateTypeValidator gte(LocalDate min) {
     validationFunctions.add(() -> {
       if (continueValidating && _value.isBefore(min)) {
-        return getMsg("validation.date.gte", getAttr(FIELD_PREFIX + attrName), min.toString());
+        return getMsg("validation.date.min", getAttr(FIELD_PREFIX + attrName), min.toString());
       }
       return null;
     });
@@ -62,7 +62,7 @@ public class DateTypeValidator extends AbstractTypeValidator<LocalDate> implemen
   public DateTypeValidator lte(LocalDate max) {
     validationFunctions.add(() -> {
       if (continueValidating && _value.isAfter(max)) {
-        return getMsg("validation.date.lte", getAttr(FIELD_PREFIX + attrName), max.toString());
+        return getMsg("validation.date.max", getAttr(FIELD_PREFIX + attrName), max.toString());
       }
       return null;
     });
