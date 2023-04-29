@@ -69,7 +69,7 @@ public abstract class AbstractTypeValidator<T> {
 
   public Mono<Void> reactiveValidate() {
     return Flux.fromIterable(reactiveValidationFunctions)
-      .flatMapSequential(Supplier::get)
+      .flatMap(Supplier::get)
       .takeUntil(str -> !str.equalsIgnoreCase(AbstractTypeValidator.NULL_STR_VALUE))
       .collectList()
       .map(errs -> {
