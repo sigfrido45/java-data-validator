@@ -1,5 +1,6 @@
 package io.sigfrido45.validation;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
@@ -67,15 +68,16 @@ public abstract class AbstractTypeValidator<T> {
   }
 
   public Mono<Void> reactiveValidate() {
-    return Mono.fromRunnable(() -> {
-      for (Supplier<Mono<String>> func : reactiveValidationFunctions) {
-        func.get().doOnNext(s -> {
-          if (!s.equalsIgnoreCase(AbstractTypeValidator.NULL_STR_VALUE)) {
-            errors.add(s);
-          }
-        }).subscribe();
-      }
-    }).then();
+    return Flux.fromIterable(reactiveValidationFunctions)
+      .flatMapSequential(Supplier::get)
+      .takeUntil(str -> !str.equalsIgnoreCase(AbstractTypeValidator.NULL_STR_VALUE))
+      .collectList()
+      .map(errs -> {
+        var filtered = errs.stream().filter(x -> !x.equalsIgnoreCase(AbstractTypeValidator.NULL_STR_VALUE)).toList();
+        errors.addAll(filtered);
+        return true;
+      })
+      .then();
   }
 
   public boolean isValid() {

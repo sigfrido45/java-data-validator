@@ -100,7 +100,6 @@ public class NodeValidator {
         if (node instanceof ChildNode<?> childNode) {
           var nodeValidator = childNode.getTypeValidation();
           var valueInfo = getValueInfo(data, nodeValidator.getAttrName());
-          System.out.println("value info " + valueInfo);
           nodeValidator.mergeAdditionalContext(additionalContext);
           nodeValidator.setMsgGetter(msgGetter);
           nodeValidator.setValueInfo(valueInfo);

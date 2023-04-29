@@ -5,6 +5,7 @@ import io.sigfrido45.validation.actions.Presence;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 public class BigDecimalReactiveTypeValidator extends AbstractTypeValidator<BigDecimal> implements Presence<BigDecimal>, DecimalInterval<BigDecimal>, TypeValidator<BigDecimal> {
 
@@ -20,8 +21,12 @@ public class BigDecimalReactiveTypeValidator extends AbstractTypeValidator<BigDe
   public BigDecimalReactiveTypeValidator cast() {
     reactiveValidationFunctions.add(() ->
       Mono.fromCallable(() -> {
-        if (continueValidating)
-          return validateCast(ValidationTypeUtil.getBigDecimalCastInfo(valueInfo.getValue()));
+        if (continueValidating) {
+          var castRes = validateCast(ValidationTypeUtil.getBigDecimalCastInfo(valueInfo.getValue()));
+          if (Objects.nonNull(castRes)) {
+            return castRes;
+          }
+        }
         return AbstractTypeValidator.NULL_STR_VALUE;
       })
 
@@ -65,13 +70,13 @@ public class BigDecimalReactiveTypeValidator extends AbstractTypeValidator<BigDe
 
   @Override
   public BigDecimalReactiveTypeValidator present(boolean present) {
-    reactiveValidationFunctions.add(()->presentAsyncValidationFunction(present));
+    reactiveValidationFunctions.add(() -> presentAsyncValidationFunction(present));
     return this;
   }
 
   @Override
   public BigDecimalReactiveTypeValidator nullable(boolean nullable) {
-    reactiveValidationFunctions.add(()->nullableAsyncValidationFunction(nullable));
+    reactiveValidationFunctions.add(() -> nullableAsyncValidationFunction(nullable));
     return this;
   }
 

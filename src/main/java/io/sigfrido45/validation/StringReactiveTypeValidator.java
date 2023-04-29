@@ -23,8 +23,12 @@ public class StringReactiveTypeValidator extends AbstractTypeValidator<String> i
   public StringReactiveTypeValidator cast() {
     reactiveValidationFunctions.add(() ->
       Mono.fromCallable(() -> {
-        if (continueValidating)
-          return validateCast(ValidationTypeUtil.getStringCastInfo(valueInfo.getValue()));
+        if (continueValidating) {
+          var castRes = validateCast(ValidationTypeUtil.getStringCastInfo(valueInfo.getValue()));
+          if (Objects.nonNull(castRes)) {
+            return castRes;
+          }
+        }
         return AbstractTypeValidator.NULL_STR_VALUE;
       })
     );

@@ -4,6 +4,8 @@ import io.sigfrido45.validation.actions.IntInterval;
 import io.sigfrido45.validation.actions.Presence;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
+
 public class IntReactiveTypeValidator extends AbstractTypeValidator<Integer> implements Presence<Integer>, IntInterval<Integer>, TypeValidator<Integer> {
 
   public IntReactiveTypeValidator(String attrName) {
@@ -18,8 +20,12 @@ public class IntReactiveTypeValidator extends AbstractTypeValidator<Integer> imp
   public IntReactiveTypeValidator cast() {
     reactiveValidationFunctions.add(() ->
       Mono.fromCallable(() -> {
-        if (continueValidating)
-          return validateCast(ValidationTypeUtil.getIntCastInfo(valueInfo.getValue()));
+        if (continueValidating) {
+          var castRes = validateCast(ValidationTypeUtil.getIntCastInfo(valueInfo.getValue()));
+          if (Objects.nonNull(castRes)) {
+            return castRes;
+          }
+        }
         return AbstractTypeValidator.NULL_STR_VALUE;
       })
     );
@@ -62,13 +68,13 @@ public class IntReactiveTypeValidator extends AbstractTypeValidator<Integer> imp
 
   @Override
   public IntReactiveTypeValidator present(boolean present) {
-    reactiveValidationFunctions.add(()->presentAsyncValidationFunction(present));
+    reactiveValidationFunctions.add(() -> presentAsyncValidationFunction(present));
     return this;
   }
 
   @Override
   public IntReactiveTypeValidator nullable(boolean nullable) {
-    reactiveValidationFunctions.add(()->nullableAsyncValidationFunction(nullable));
+    reactiveValidationFunctions.add(() -> nullableAsyncValidationFunction(nullable));
     return this;
   }
 }

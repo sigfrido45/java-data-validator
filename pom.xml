@@ -33,12 +33,6 @@
             <scope>test</scope>
             <version>3.5.3</version>
         </dependency>
-        <dependency>
-            <groupId>io.projectreactor.tools</groupId>
-            <artifactId>blockhound-junit-platform</artifactId>
-            <version>1.0.6.RELEASE</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>

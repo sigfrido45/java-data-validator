@@ -15,6 +15,7 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class ListReactiveValidator extends AbstractTypeValidator<List<Object>> implements Presence<List<Object>>, TypeValidator<List<Object>>, Iterable<List<Object>>, IntInterval<List<Object>> {
 
@@ -30,8 +31,12 @@ public class ListReactiveValidator extends AbstractTypeValidator<List<Object>> i
   public ListReactiveValidator cast() {
     reactiveValidationFunctions.add(() ->
       Mono.fromCallable(() -> {
-        if (continueValidating)
-          return validateCast(ValidationTypeUtil.getListCastInfo(valueInfo.getValue()));
+        if (continueValidating) {
+          var res = validateCast(ValidationTypeUtil.getListCastInfo(valueInfo.getValue()));
+          if (Objects.nonNull(res)) {
+            return res;
+          }
+        }
         return AbstractTypeValidator.NULL_STR_VALUE;
       })
     );
@@ -123,11 +128,13 @@ public class ListReactiveValidator extends AbstractTypeValidator<List<Object>> i
 
             return Mono.just(AbstractTypeValidator.NULL_STR_VALUE);
           })
-//          .next();
-
           .takeUntil(x -> !x.equalsIgnoreCase(AbstractTypeValidator.NULL_STR_VALUE))
           .collectList()
-          .map(x -> x.get(0));
+          .map(x -> x.stream()
+            .filter(s -> !s.equalsIgnoreCase(AbstractTypeValidator.NULL_STR_VALUE))
+            .findFirst()
+            .orElse(AbstractTypeValidator.NULL_STR_VALUE)
+          );
 
       }
       return Mono.fromCallable(() -> AbstractTypeValidator.NULL_STR_VALUE);
