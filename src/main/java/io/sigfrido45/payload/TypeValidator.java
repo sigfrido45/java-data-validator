@@ -102,4 +102,12 @@ public class TypeValidator {
   public static BigDecimalTypeValidator bigDecimal() {
     return new BigDecimalTypeValidator();
   }
+
+  public static DateTypeValidator date() {
+    return new DateTypeValidator();
+  }
+
+  public static DateTypeValidator date(String attr) {
+    return new DateTypeValidator(attr);
+  }
 }

@@ -1,6 +1,7 @@
 package io.sigfrido45.validation;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -110,6 +111,15 @@ public class ValidationTypeUtil {
       } catch (Exception e) {
         castedInfo.setValid(false);
       }
+    }
+    return castedInfo;
+  }
+
+  public static CastInfo<LocalDate> getDateCastInfo(Object value) {
+    var castedInfo = new CastInfo<LocalDate>();
+    castedInfo.setValid(true);
+    if (value instanceof LocalDate casted) {
+      castedInfo.setCasted(casted);
     }
     return castedInfo;
   }
