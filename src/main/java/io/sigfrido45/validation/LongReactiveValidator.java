@@ -20,7 +20,7 @@ public class LongReactiveValidator extends AbstractTypeValidator<Long> implement
       Mono.fromCallable(() -> {
         if (continueValidating)
           return validateCast(ValidationTypeUtil.getLongCastInfo(valueInfo.getValue()));
-        return null;
+        return AbstractTypeValidator.NULL_STR_VALUE;
       })
     );
     return this;
@@ -32,7 +32,7 @@ public class LongReactiveValidator extends AbstractTypeValidator<Long> implement
       Mono.fromCallable(() -> {
         if (continueValidating && _value < min)
           return getMsg("validation.number.min", getAttr(FIELD_PREFIX + attrName), String.valueOf(min));
-        return null;
+        return AbstractTypeValidator.NULL_STR_VALUE;
       })
     );
     return this;
@@ -44,7 +44,7 @@ public class LongReactiveValidator extends AbstractTypeValidator<Long> implement
       Mono.fromCallable(() -> {
         if (continueValidating && _value > max)
           return getMsg("validation.number.max", getAttr(FIELD_PREFIX + attrName), String.valueOf(max));
-        return null;
+        return AbstractTypeValidator.NULL_STR_VALUE;
       })
     );
     return this;

@@ -32,7 +32,7 @@ public class ListReactiveValidator extends AbstractTypeValidator<List<Object>> i
       Mono.fromCallable(() -> {
         if (continueValidating)
           return validateCast(ValidationTypeUtil.getListCastInfo(valueInfo.getValue()));
-        return null;
+        return AbstractTypeValidator.NULL_STR_VALUE;
       })
     );
     return this;
@@ -44,7 +44,7 @@ public class ListReactiveValidator extends AbstractTypeValidator<List<Object>> i
       Mono.fromCallable(() -> {
         if (continueValidating && _value.size() < min)
           return getMsg("validation.list.min", getAttr(FIELD_PREFIX + attrName), String.valueOf(min));
-        return null;
+        return AbstractTypeValidator.NULL_STR_VALUE;
       })
     );
     return this;
@@ -56,7 +56,7 @@ public class ListReactiveValidator extends AbstractTypeValidator<List<Object>> i
       Mono.fromCallable(() -> {
         if (continueValidating && _value.size() > max)
           return getMsg("validation.list.max", getAttr(FIELD_PREFIX + attrName), String.valueOf(max));
-        return null;
+        return AbstractTypeValidator.NULL_STR_VALUE;
       })
     );
     return this;
@@ -123,7 +123,12 @@ public class ListReactiveValidator extends AbstractTypeValidator<List<Object>> i
 
             return Mono.just(AbstractTypeValidator.NULL_STR_VALUE);
           })
-          .next();
+//          .next();
+
+          .takeUntil(x -> !x.equalsIgnoreCase(AbstractTypeValidator.NULL_STR_VALUE))
+          .collectList()
+          .map(x -> x.get(0));
+
       }
       return Mono.fromCallable(() -> AbstractTypeValidator.NULL_STR_VALUE);
     });

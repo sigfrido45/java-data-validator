@@ -3,7 +3,10 @@ package io.sigfrido45.validation;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -66,9 +69,11 @@ public abstract class AbstractTypeValidator<T> {
 
   public Mono<Void> reactiveValidate() {
     return Flux.fromIterable(reactiveValidationFunctions)
-      .flatMap(Supplier::get)
-      .takeUntil(Objects::nonNull)
-      .filter(str -> !str.equalsIgnoreCase(AbstractTypeValidator.NULL_STR_VALUE))
+      .flatMapSequential(Supplier::get)
+      .takeUntil(x -> {
+        System.out.println("x " + x);
+        return !x.equalsIgnoreCase(AbstractTypeValidator.NULL_STR_VALUE);
+      })
       .collectList()
       .map(errs -> errors.addAll(errs))
       .then();
@@ -144,7 +149,7 @@ public abstract class AbstractTypeValidator<T> {
       } else if (continueValidating && !present && !valueInfo.isPresent()) {
         continueValidating = false;
       }
-      return null;
+      return NULL_STR_VALUE;
     });
   }
 
@@ -166,7 +171,7 @@ public abstract class AbstractTypeValidator<T> {
       } else if (continueValidating && !wantNull && isNull(valueInfo.getValue())) {
         return getMsg("validation.nullable", getAttr(FIELD_PREFIX + attrName));
       }
-      return null;
+      return NULL_STR_VALUE;
     });
   }
 

@@ -25,7 +25,7 @@ public class StringReactiveTypeValidator extends AbstractTypeValidator<String> i
       Mono.fromCallable(() -> {
         if (continueValidating)
           return validateCast(ValidationTypeUtil.getStringCastInfo(valueInfo.getValue()));
-        return null;
+        return AbstractTypeValidator.NULL_STR_VALUE;
       })
     );
     return this;
@@ -37,7 +37,7 @@ public class StringReactiveTypeValidator extends AbstractTypeValidator<String> i
       Mono.fromCallable(() -> {
         if (continueValidating && _value.length() < min)
           return getMsg("validation.string.min", getAttr(FIELD_PREFIX + attrName), String.valueOf(min));
-        return null;
+        return AbstractTypeValidator.NULL_STR_VALUE;
       })
     );
     return this;
@@ -49,7 +49,7 @@ public class StringReactiveTypeValidator extends AbstractTypeValidator<String> i
       Mono.fromCallable(() -> {
         if (continueValidating && _value.length() > max)
           return getMsg("validation.string.max", getAttr(FIELD_PREFIX + attrName), String.valueOf(max));
-        return null;
+        return AbstractTypeValidator.NULL_STR_VALUE;
       })
     );
     return this;
@@ -82,7 +82,7 @@ public class StringReactiveTypeValidator extends AbstractTypeValidator<String> i
       Mono.fromCallable(() -> {
         if (continueValidating && !pattern.matcher(_value).matches())
           return getMsg("validation.string.regex", getAttr(FIELD_PREFIX + attrName));
-        return null;
+        return AbstractTypeValidator.NULL_STR_VALUE;
       })
     );
     return this;
@@ -93,7 +93,7 @@ public class StringReactiveTypeValidator extends AbstractTypeValidator<String> i
       Mono.fromCallable(() -> {
         if (continueValidating && _value.trim().isEmpty())
           return getMsg("validation.string.empty", getAttr(FIELD_PREFIX + attrName));
-        return null;
+        return AbstractTypeValidator.NULL_STR_VALUE;
       })
     );
     return this;
@@ -116,7 +116,7 @@ public class StringReactiveTypeValidator extends AbstractTypeValidator<String> i
             return getMsg("validation.string.in", getAttr(FIELD_PREFIX + attrName), String.join(",", args));
           }
         }
-        return null;
+        return AbstractTypeValidator.NULL_STR_VALUE;
       })
     );
     return this;

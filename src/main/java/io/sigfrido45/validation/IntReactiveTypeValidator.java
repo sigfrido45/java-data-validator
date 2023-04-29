@@ -20,7 +20,7 @@ public class IntReactiveTypeValidator extends AbstractTypeValidator<Integer> imp
       Mono.fromCallable(() -> {
         if (continueValidating)
           return validateCast(ValidationTypeUtil.getIntCastInfo(valueInfo.getValue()));
-        return null;
+        return AbstractTypeValidator.NULL_STR_VALUE;
       })
     );
     return this;
@@ -32,7 +32,7 @@ public class IntReactiveTypeValidator extends AbstractTypeValidator<Integer> imp
       Mono.fromCallable(() -> {
         if (continueValidating && _value < min)
           return getMsg("validation.string.min", getAttr(FIELD_PREFIX + attrName), String.valueOf(min));
-        return null;
+        return AbstractTypeValidator.NULL_STR_VALUE;
       })
     );
     return this;
@@ -44,7 +44,7 @@ public class IntReactiveTypeValidator extends AbstractTypeValidator<Integer> imp
       Mono.fromCallable(() -> {
         if (continueValidating && _value > max)
           return getMsg("validation.string.max", getAttr(FIELD_PREFIX + attrName), String.valueOf(max));
-        return null;
+        return AbstractTypeValidator.NULL_STR_VALUE;
       })
     );
     return this;

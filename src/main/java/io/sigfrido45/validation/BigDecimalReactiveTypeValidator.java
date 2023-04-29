@@ -22,7 +22,7 @@ public class BigDecimalReactiveTypeValidator extends AbstractTypeValidator<BigDe
       Mono.fromCallable(() -> {
         if (continueValidating)
           return validateCast(ValidationTypeUtil.getBigDecimalCastInfo(valueInfo.getValue()));
-        return null;
+        return AbstractTypeValidator.NULL_STR_VALUE;
       })
 
     );
@@ -35,7 +35,7 @@ public class BigDecimalReactiveTypeValidator extends AbstractTypeValidator<BigDe
       Mono.fromCallable(() -> {
         if (continueValidating && _value.compareTo(BigDecimal.valueOf(min)) < 0)
           return getMsg("validation.number.min", getAttr(FIELD_PREFIX + attrName), String.valueOf(min));
-        return null;
+        return AbstractTypeValidator.NULL_STR_VALUE;
       })
     );
     return this;
@@ -47,7 +47,7 @@ public class BigDecimalReactiveTypeValidator extends AbstractTypeValidator<BigDe
       Mono.fromCallable(() -> {
         if (continueValidating && _value.compareTo(BigDecimal.valueOf(max)) > 0)
           return getMsg("validation.number.max", getAttr(FIELD_PREFIX + attrName), String.valueOf(max));
-        return null;
+        return AbstractTypeValidator.NULL_STR_VALUE;
       })
     );
     return this;
@@ -80,7 +80,7 @@ public class BigDecimalReactiveTypeValidator extends AbstractTypeValidator<BigDe
       Mono.fromCallable(() -> {
         if (continueValidating && _value.scale() > decimals)
           return getMsg("validation.number.decimals-count", getAttr(FIELD_PREFIX + attrName), String.valueOf(decimals));
-        return null;
+        return AbstractTypeValidator.NULL_STR_VALUE;
       })
     );
     return this;

@@ -19,7 +19,7 @@ public class BooleanReactiveTypeValidator extends AbstractTypeValidator<Boolean>
       Mono.fromCallable(() -> {
         if (continueValidating)
           return validateCast(ValidationTypeUtil.getBooleanCastInfo(valueInfo.getValue()));
-        return null;
+        return AbstractTypeValidator.NULL_STR_VALUE;
       })
     );
     return this;
