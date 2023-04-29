@@ -27,13 +27,13 @@ public class BooleanReactiveTypeValidator extends AbstractTypeValidator<Boolean>
 
   @Override
   public BooleanReactiveTypeValidator present(boolean present) {
-    reactiveValidationFunctions.add(presentAsyncValidationFunction(present));
+    reactiveValidationFunctions.add(()->presentAsyncValidationFunction(present));
     return this;
   }
 
   @Override
   public BooleanReactiveTypeValidator nullable(boolean nullable) {
-    reactiveValidationFunctions.add(nullableAsyncValidationFunction(nullable));
+    reactiveValidationFunctions.add(()->nullableAsyncValidationFunction(nullable));
     return this;
   }
 }

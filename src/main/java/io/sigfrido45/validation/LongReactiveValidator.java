@@ -62,13 +62,13 @@ public class LongReactiveValidator extends AbstractTypeValidator<Long> implement
 
   @Override
   public LongReactiveValidator present(boolean present) {
-    reactiveValidationFunctions.add(presentAsyncValidationFunction(present));
+    reactiveValidationFunctions.add(()->presentAsyncValidationFunction(present));
     return this;
   }
 
   @Override
   public LongReactiveValidator nullable(boolean nullable) {
-    reactiveValidationFunctions.add(nullableAsyncValidationFunction(nullable));
+    reactiveValidationFunctions.add(()->nullableAsyncValidationFunction(nullable));
     return this;
   }
 }

@@ -67,13 +67,13 @@ public class StringReactiveTypeValidator extends AbstractTypeValidator<String> i
 
   @Override
   public StringReactiveTypeValidator present(boolean present) {
-    reactiveValidationFunctions.add(presentAsyncValidationFunction(present));
+    reactiveValidationFunctions.add(() -> presentAsyncValidationFunction(present));
     return this;
   }
 
   @Override
   public StringReactiveTypeValidator nullable(boolean nullable) {
-    reactiveValidationFunctions.add(nullableAsyncValidationFunction(nullable));
+    reactiveValidationFunctions.add(() -> nullableAsyncValidationFunction(nullable));
     return this;
   }
 

@@ -62,13 +62,13 @@ public class IntReactiveTypeValidator extends AbstractTypeValidator<Integer> imp
 
   @Override
   public IntReactiveTypeValidator present(boolean present) {
-    reactiveValidationFunctions.add(presentAsyncValidationFunction(present));
+    reactiveValidationFunctions.add(()->presentAsyncValidationFunction(present));
     return this;
   }
 
   @Override
   public IntReactiveTypeValidator nullable(boolean nullable) {
-    reactiveValidationFunctions.add(nullableAsyncValidationFunction(nullable));
+    reactiveValidationFunctions.add(()->nullableAsyncValidationFunction(nullable));
     return this;
   }
 }

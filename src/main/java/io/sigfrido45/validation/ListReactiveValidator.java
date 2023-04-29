@@ -138,13 +138,13 @@ public class ListReactiveValidator extends AbstractTypeValidator<List<Object>> i
 
   @Override
   public ListReactiveValidator present(boolean present) {
-    reactiveValidationFunctions.add(presentAsyncValidationFunction(present));
+    reactiveValidationFunctions.add(() -> presentAsyncValidationFunction(present));
     return this;
   }
 
   @Override
   public ListReactiveValidator nullable(boolean nullable) {
-    reactiveValidationFunctions.add(nullableAsyncValidationFunction(nullable));
+    reactiveValidationFunctions.add(() -> nullableAsyncValidationFunction(nullable));
     return this;
   }
 

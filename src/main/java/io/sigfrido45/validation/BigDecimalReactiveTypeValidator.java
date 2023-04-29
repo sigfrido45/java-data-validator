@@ -65,13 +65,13 @@ public class BigDecimalReactiveTypeValidator extends AbstractTypeValidator<BigDe
 
   @Override
   public BigDecimalReactiveTypeValidator present(boolean present) {
-    reactiveValidationFunctions.add(presentAsyncValidationFunction(present));
+    reactiveValidationFunctions.add(()->presentAsyncValidationFunction(present));
     return this;
   }
 
   @Override
   public BigDecimalReactiveTypeValidator nullable(boolean nullable) {
-    reactiveValidationFunctions.add(nullableAsyncValidationFunction(nullable));
+    reactiveValidationFunctions.add(()->nullableAsyncValidationFunction(nullable));
     return this;
   }
 

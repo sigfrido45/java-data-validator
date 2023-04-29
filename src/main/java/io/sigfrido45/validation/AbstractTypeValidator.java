@@ -1,6 +1,5 @@
 package io.sigfrido45.validation;
 
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
@@ -68,15 +67,15 @@ public abstract class AbstractTypeValidator<T> {
   }
 
   public Mono<Void> reactiveValidate() {
-    return Flux.fromIterable(reactiveValidationFunctions)
-      .flatMapSequential(Supplier::get)
-      .takeUntil(x -> {
-        System.out.println("x " + x);
-        return !x.equalsIgnoreCase(AbstractTypeValidator.NULL_STR_VALUE);
-      })
-      .collectList()
-      .map(errs -> errors.addAll(errs))
-      .then();
+    return Mono.fromRunnable(() -> {
+      for (Supplier<Mono<String>> func : reactiveValidationFunctions) {
+        func.get().doOnNext(s -> {
+          if (!s.equalsIgnoreCase(AbstractTypeValidator.NULL_STR_VALUE)) {
+            errors.add(s);
+          }
+        }).subscribe();
+      }
+    }).then();
   }
 
   public boolean isValid() {
@@ -142,8 +141,8 @@ public abstract class AbstractTypeValidator<T> {
     };
   }
 
-  protected Supplier<Mono<String>> presentAsyncValidationFunction(boolean present) {
-    return () -> Mono.fromCallable(() -> {
+  protected Mono<String> presentAsyncValidationFunction(boolean present) {
+    return Mono.fromCallable(() -> {
       if (continueValidating && present && !valueInfo.isPresent()) {
         return getMsg("validation.present", getAttr(FIELD_PREFIX + attrName));
       } else if (continueValidating && !present && !valueInfo.isPresent()) {
@@ -164,8 +163,8 @@ public abstract class AbstractTypeValidator<T> {
     };
   }
 
-  protected Supplier<Mono<String>> nullableAsyncValidationFunction(boolean wantNull) {
-    return () -> Mono.fromCallable(() -> {
+  protected Mono<String> nullableAsyncValidationFunction(boolean wantNull) {
+    return Mono.fromCallable(() -> {
       if (continueValidating && wantNull && isNull(valueInfo.getValue())) {
         continueValidating = false;
       } else if (continueValidating && !wantNull && isNull(valueInfo.getValue())) {
